@@ -30,3 +30,4 @@ tzdata==2024.1
 tzlocal==5.2
 uvicorn==0.30.6
 websockets==13.0.1
+cryptography==41.0.3
