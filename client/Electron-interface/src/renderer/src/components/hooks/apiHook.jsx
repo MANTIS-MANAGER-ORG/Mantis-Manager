@@ -7,17 +7,23 @@ export const useApi = () => {
   const fetchApi = async (url, method = 'GET', body = null, headers = {}) => {
     setLoading(true);
     setError(null);
+    console.log(body);
 
     try {
       const options = {
         method,
         headers: {
           ...headers,
+          
           'Content-Type': 'application/json',
+
           'Authorization': `Bearer ${localStorage.getItem('access_token') || ''}`, // Agregar el token si existe
         },
         ...(body && { body: JSON.stringify(body) }),
       };
+
+
+      console.log(localStorage.getItem('access_token'));
 
       // Usar la función fetchApi expuesta en el preload
       const response = await window.api.fetchApi(url, method, body, headers);

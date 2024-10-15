@@ -3,6 +3,7 @@ import { contextBridge } from 'electron';
 // API personalizada para exponer en el renderer
 const api = {
   fetchApi: async (url, method = 'GET', body = null, headers = {}) => {
+    
     const options = {
       method,
       headers: {
@@ -12,8 +13,12 @@ const api = {
       },
       ...(body && { body: JSON.stringify(body) }),
     };
+    console.log("hola soy options", options);
+   
+
 
     try {
+  
       // Aquí hacemos la solicitud a la API usando el contexto de Electron
       const response = await fetch(url, options);
       
@@ -21,7 +26,7 @@ const api = {
         // Intentar obtener el mensaje de error específico de la respuesta
         const errorData = await response.json();
         throw new Error(errorData.detail || 'Error en la solicitud');
-        console.log(errorData.detail) // Cambia 'detail' según lo que devuelve tu API
+        // Cambia 'detail' según lo que devuelve tu API
       }
 
       return await response.json();

@@ -2,30 +2,55 @@ import React, { useState } from 'react';
 
 const MachineForm = ({ addMachine, closeModal }) => {
   const [formData, setFormData] = useState({
+    id: '',
     type: '',
     brand: '',
+    model: '',
     serial: '',
-    action: '',
+    description: '',
+    action: '', // Solo una vez
   });
+
+
+
 
   const handleChange = (key, value) => {
     setFormData({ ...formData, [key]: value });
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    const newMachine = {
-      ...formData,
+    
+    
+    const newMachine = { 
+      id: formData.id,
+      type: formData.type,
+      brand: formData.brand,
+      model: formData.model,
+      serial: formData.serial,
+      description: formData.description,
+      action: formData.action, // Solo una vez
+
+
     };
-    addMachine(newMachine);
-    // Reiniciar el formulario
-    setFormData({
-      type: '',
-      brand: '',
-      serial: '',
-      action: '',
-    });
-    closeModal();
+    console.log(newMachine);
+
+    try {
+      await addMachine(newMachine); // Asegúrate de que addMachine maneje correctamente la promesa
+      // Reiniciar el formulario
+      setFormData({
+        id: '',
+        type: '',
+        brand: '',
+        model: '',
+        serial: '',
+        description: '',
+        action: '',
+      });
+      closeModal();
+    } catch (error) {
+      console.error("Error al agregar la máquina:", error); // Manejar el error si es necesario
+    }
   };
 
   return (
@@ -33,6 +58,16 @@ const MachineForm = ({ addMachine, closeModal }) => {
       <div className="bg-white p-6 rounded-lg shadow-lg max-w-md w-full relative z-50">
         <h2 className="text-2xl font-semibold mb-4">Agregar Máquina</h2>
         <form onSubmit={handleSubmit}>
+          <div className='mb-4'>
+            <label className="block text-gray-700">ID</label>
+            <input
+              type="text"
+              value={formData.id}
+              onChange={(e) => handleChange('id', e.target.value)}
+              required
+              className="mt-1 p-2 border border-gray-300 rounded w-full"
+            />
+          </div>
           <div className="mb-4">
             <label className="block text-gray-700">Tipo</label>
             <input
@@ -53,6 +88,16 @@ const MachineForm = ({ addMachine, closeModal }) => {
               className="mt-1 p-2 border border-gray-300 rounded w-full"
             />
           </div>
+          <div className='mb-4'> {/* Corrección de 'di' a 'div' */}
+            <label className="block text-gray-700">Modelo</label>
+            <input
+              type="text"
+              value={formData.model}
+              onChange={(e) => handleChange('model', e.target.value)}
+              required
+              className="mt-1 p-2 border border-gray-300 rounded w-full"
+            />
+          </div>
           <div className="mb-4">
             <label className="block text-gray-700">Serial</label>
             <input
@@ -64,14 +109,32 @@ const MachineForm = ({ addMachine, closeModal }) => {
             />
           </div>
           <div className="mb-4">
-            <label className="block text-gray-700">Acción</label>
+            <label className="block text-gray-700">Descripción</label>
             <input
               type="text"
-              value={formData.action}
-              onChange={(e) => handleChange('action', e.target.value)}
+              value={formData.description}
+              onChange={(e) => handleChange('description', e.target.value)}
               required
               className="mt-1 p-2 border border-gray-300 rounded w-full"
             />
+          </div>
+          <div className='mb-4'>
+            <label className="block text-gray-700">Acción</label>
+            <select
+              
+              value={formData.action}
+              onChange={(e) => handleChange('action', e.target.value)}// e.target,value
+              required
+              className="mt-1 p-2 border border-gray-300 rounded w-full"
+            >
+              <option value="">Seleccione una acción</option>
+              <option value="tejer">Tejer</option>
+              <option value="teñir">Teñir</option>
+              <option value="urdir">Urdir</option>
+              <option value="fijar">Fijar</option>
+            </select>
+
+
           </div>
 
           <div className="mt-4">

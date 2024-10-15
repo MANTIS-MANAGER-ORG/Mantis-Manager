@@ -39,7 +39,8 @@ async def create_machine(
     La acción debe ser una de las siguientes: tejer, teñir, urdir, fijar.
     """
     user = req.state.user
-    if user.get("scope") != 4:
+    print("Scope del usuario:", user.get("scopes"))  
+    if user.get("scopes") != 4:
         raise HTTPException(status_code=403, detail="No tienes permisos para realizar esta acción")
     
     existing_machine_by_id = db.query(Machine).filter(Machine.id == machine.id).first()
@@ -181,7 +182,8 @@ async def delete_machine(
     """
     
     user = req.state.user
-    if user.get("scope") != 4:
+    if user.get("scopes") != 4:
+        print(user.get("scopes"))
         raise HTTPException(status_code=403, detail="No tienes permisos para realizar esta acción")
     
     machine = db.query(Machine).filter(Machine.id == machine_id).first()
