@@ -150,14 +150,7 @@ const [editingMachineData, setEditingMachineData] = useState({});
     }
   };
 
-  const toggleMachineStatus = (index) => {
-    const updatedMachines = machines.map((machine, i) =>
-      i === index
-        ? { ...machine, status: machine.status === 'Mantenimiento' ? 'Operativa' : 'Mantenimiento' }
-        : machine
-    );
-    setMachines(updatedMachines); 
-  };
+  
 
   const openDetailsModal = (machine) => {
     setSelectedMachine(machine);
@@ -179,7 +172,7 @@ const [editingMachineData, setEditingMachineData] = useState({});
         machines,
         addMachine,
         deleteMachine,
-        toggleMachineStatus,
+        
         openDetailsModal,
         closeDetailsModal,
         isModalOpen,
