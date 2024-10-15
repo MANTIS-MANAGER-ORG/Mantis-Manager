@@ -32,13 +32,13 @@ class User(Base):
 
     __tablename__ = 'user'
 
-    id = Column(String, primary_key=True)
-    password = Column(String, nullable=False)
-    first_name = Column(String, nullable=False)
-    last_name = Column(String, nullable=False)
-    email = Column(String, nullable=False)
-    phone = Column(String, nullable=False)
-    image_field = Column(String, nullable=True, default=None)
+    id = Column(String(11), primary_key=True)
+    password = Column(String(350), nullable=False)
+    first_name = Column(String(50), nullable=False)
+    last_name = Column(String(50), nullable=False)
+    email = Column(String(200), nullable=False)
+    phone = Column(String(14), nullable=False)
+    image_field = Column(String(200), nullable=True, default=None)
     role_id = Column(Integer, ForeignKey('role.id'))
     role = relationship("Role", back_populates="user")
 
@@ -74,5 +74,5 @@ class Role(Base):
     __tablename__ = 'role'
 
     id = Column(Integer, primary_key=True)
-    name = Column(String, nullable=False)
+    name = Column(String(100), nullable=False)
     user = relationship("User", back_populates="role")

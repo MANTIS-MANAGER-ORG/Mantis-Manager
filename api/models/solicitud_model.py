@@ -26,11 +26,11 @@ class Solicitud(Base):
     id = Column(Integer, primary_key=True, autoincrement=True, nullable=False)
     created_at = Column(DateTime(timezone=True), server_default=func.now(),
                         nullable=False)
-    description = Column(String, nullable=False)
+    description = Column(String(2000), nullable=False)
 
     # Relación con la tabla Ticket
     ticket_id = Column(Integer, ForeignKey('ticket.id'), nullable=False)
     ticket = relationship("Ticket", back_populates="solicitudes")
 
-    status = Column(String, default='pendiente', nullable=False)
-    type = Column(String, nullable=False)
+    status = Column(String(100), default='pendiente', nullable=False)
+    type = Column(String(100), nullable=False)
