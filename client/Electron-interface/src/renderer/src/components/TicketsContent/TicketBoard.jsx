@@ -1,24 +1,31 @@
 import React, { useState } from "react";
 import TicketCard from "./Tarjeta"; // Importa el componente TicketCard
 import { useTicketContext } from "../context/ticketContext"; // Importa el contexto para manejar los tickets
+import { HiArrowLeft, HiArrowRight } from 'react-icons/hi';
 
 // Componente TicketBoard
+
 const TicketBoard = () => {
-  // Estado local para gestionar la pestaña seleccionada
   const [selectedTab, setSelectedTab] = useState("En cola");
   
-  // Desestructura los datos y funciones del contexto de tickets
-  const { ticketsData, handleCancel, handleEdit } = useTicketContext();
+  const { 
+    ticketsData, 
+    handleCancel, 
+    handleEdit, 
+    page,
+    setCurrentPage,
+    handlePageR,
+    handlePageL,
+    loading,
+    hasMoreTickets, // Obtener el estado de más tickets
+  } = useTicketContext();
 
-  // Función para cambiar la pestaña activa. Cambia el estado y este es pasado como props a la tarjeta y en base a eso se muestra cierta info 
   const handleTabClick = (tab) => {
     setSelectedTab(tab);
   };
 
-
   return (
     <div className="ticket-board container mx-auto p-4 bg-gray-50 shadow-md rounded-lg">
-      {/* Tabs para cambiar entre diferentes categorías de tickets */}
       <div className="tabs flex justify-center space-x-4 mb-4">
         <button
           className={`py-2 px-4 rounded-full focus:outline-none transition duration-300 ${
@@ -52,12 +59,9 @@ const TicketBoard = () => {
         </button>
       </div>
 
-      {/* Lista de tickets filtrada por la pestaña seleccionada */}
       <div className="ticket-list grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
         {console.log(ticketsData)}
         {ticketsData[selectedTab] && ticketsData[selectedTab].map((ticket) => (
-          
-          
           <TicketCard
             key={ticket.id}
             ticket={ticket}
@@ -66,6 +70,12 @@ const TicketBoard = () => {
             tab={selectedTab}
           />
         ))}
+      </div>
+
+      {/* Botones de flechas */}
+      <div className="flex p-4">
+        <HiArrowLeft onClick={handlePageL} className={`cursor-pointer ${page === 1 ? 'opacity-50 cursor-not-allowed' : ''}`}/>
+        <HiArrowRight  onClick={handlePageR} className={`ml-2 cursor-pointer ${!hasMoreTickets ? 'opacity-50 cursor-not-allowed' : ''}`}  />
       </div>
 
       {/* Mensaje si no hay tickets en la categoría seleccionada */}

@@ -124,7 +124,7 @@ const TicketCard = ({ ticket, onCancel, onEdit, tab }) => {
           <p className="text-gray-600"><strong>Descripción:</strong> {ticket.description}</p>
           <p className="text-gray-600"><strong>Persona que hace la petición:</strong> {ticket.created_by.id}</p>
           <p className="text-gray-600"><strong>Prioridad:</strong> {ticket.priority}</p>
-          <p className="text-gray-600"><strong>Máquina:</strong> {ticket.machine_serial}</p>
+          <p className="text-gray-600"><strong>Máquina:</strong> {ticket.machine_id}</p>
           <div className="h-2 w-full rounded mt-4" style={{ backgroundColor: ticket.color }}></div>
           <div className="flex space-x-2 mt-4">
             <button

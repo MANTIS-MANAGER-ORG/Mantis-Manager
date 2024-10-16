@@ -1,30 +1,34 @@
-// src/context/TicketContext.js
 import React, { createContext, useState, useContext } from "react";
 import { useApi } from "../hooks/apiHook"; // Importar el hook de API
-// revisar documentación par< implmentar usecallback para un mayor rendimiento 
+
 // Crear el contexto
 const TicketContext = createContext();
 
 export const TicketProvider = ({ children }) => {
-  const { fetchApi , loading, error } = useApi(); // Usar el hook de API
+  const { fetchApi, loading, error } = useApi(); // Usar el hook de API
   const [ticketsData, setTicketsData] = useState({ "En cola": [], "En proceso": [], "Terminados": [] });
   const [showGenerarTickets, setShowGenerarTickets] = useState(false);
   const [history, setHistory] = useState([]);
-  
+  const [page, setCurrentPage] = useState(1);
+  const [hasMoreTickets, setHasMoreTickets] = useState(true); // Estado para más tickets
+
   const recordHistory = (ticketId, action) => {
     const date = new Date().toLocaleDateString();
     setHistory(prevHistory => [...prevHistory, { date, ticketId, action }]);
   };
 
-  const fetchTickets = async () => {
-    const page=parseInt(1)
-    const limit=parseInt(10)
+  const fetchTickets = async (page = 1, limit = 10) => {
     const url = `http://127.0.0.1:8000/tickets/tickets?page=${page}&limit=${limit}`;
 
     try {
       const data = await fetchApi(url, 'GET'); // Usar el hook de API
-  
+
+      // Filtrar los tickets pendientes
       const pendientes = data.tickets.length > 0 ? data.tickets.filter(i => i.state === "pendiente") : [];
+
+     
+      const moreTickets = data.tickets.length === limit; // se le establece un valor de verdadero si se cumple esa operación lógica
+      setHasMoreTickets(moreTickets);
 
       setTicketsData(prevTickets => ({
         ...prevTickets,
@@ -85,6 +89,21 @@ export const TicketProvider = ({ children }) => {
     fetchTickets();
   }, []);
 
+  const handlePageR = () => {
+    if (!hasMoreTickets) return; // Si no hay más tickets, no hacer nada
+    const nextPage = page + 1;
+    setCurrentPage(nextPage);
+    fetchTickets(nextPage);
+  };
+
+  const handlePageL = () => {
+    if (page > 1) {
+      const nextPage = page - 1;
+      setCurrentPage(nextPage);
+      fetchTickets(nextPage);
+    }
+  };
+
   return (
     <TicketContext.Provider value={{
       ticketsData,
@@ -93,7 +112,13 @@ export const TicketProvider = ({ children }) => {
       handleEdit,
       showGenerarTickets,
       toggleGenerarTickets,
-      history
+      history,
+      page,
+      setCurrentPage,
+      handlePageR,
+      handlePageL,
+      loading,
+      hasMoreTickets, // Proporcionar hasMoreTickets
     }}>
       {children}
     </TicketContext.Provider>
@@ -101,5 +126,6 @@ export const TicketProvider = ({ children }) => {
 };
 
 export const useTicketContext = () => useContext(TicketContext);
+
 
 
