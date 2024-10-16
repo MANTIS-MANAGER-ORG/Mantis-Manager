@@ -386,6 +386,15 @@ async def assign_ticket(
         ticket.created_by
     )
     
+    await manager.send_personal_message(
+        {
+            "message": f"Se te ha asignado el ticket con id {ticket.id} para la maquina {ticket.machine_id}",
+            "type":"info",
+            "timestamp": datetime.now().isoformat()
+        },
+        user.id
+    )
+    
     return TicketStandartResponse(
         id=ticket.id,
         description=ticket.description,
@@ -472,6 +481,24 @@ async def change_ticket_state(
                 "type": solicitud.type
             }
             related_open_requests.append(solicitud_data)
+            
+    await manager.send_personal_message(
+        {
+            "message": f"Se ha cambiado el estado de tu ticket con id {ticket.id} para la maquina {ticket.machine_id} a {ticket_state}.",
+            "type":"info",
+            "timestamp": datetime.now().isoformat()
+        },
+        ticket.created_by
+    )
+    
+    await manager.send_personal_message(
+        {
+            "message": f"Se ha cambiado el estado del ticket con id {ticket.id} para la maquina {ticket.machine_id} del que eres encargado a {ticket_state}.",
+            "type":"info",
+            "timestamp": datetime.now().isoformat()
+        },
+        ticket.assigned_to
+    )
     
     return TicketStandartResponse(
         id=ticket.id,
@@ -565,7 +592,25 @@ async def request_ticket_closure(
     )  
     
     db.add(new_registro)
-    db.commit()    
+    db.commit()  
+    
+    await manager.send_personal_message(
+        {
+            "message": f"Se ha solicitado el cierre de tu ticket con id {ticket.id} para la maquina {ticket.machine_id}",
+            "type":"info",
+            "timestamp": datetime.now().isoformat()
+        },
+        ticket.created_by
+    )
+    
+    await manager.send_personal_message(
+        {
+            "message": f"Se ha solicitado el cierre del ticket con id {ticket.id} para la maquina {ticket.machine_id} del que eres encargado a.",
+            "type":"info",
+            "timestamp": datetime.now().isoformat()
+        },
+        ticket.assigned_to
+    )  
 
     return TicketSolicitudInfo(
         detail="Solicitud de cierre enviada correctamente. Sera notificado con la respuesta.",
