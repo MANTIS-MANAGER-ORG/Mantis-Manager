@@ -1,3 +1,5 @@
+from datetime import datetime
+
 from fastapi import APIRouter, Depends
 from fastapi.responses import JSONResponse
 
@@ -58,15 +60,14 @@ async def login(
         "phone": user.phone,
         "role_id": user.role_id
     }
-    """    
-        from services.web_socket_service import ConnectionManager
-        
-        await ConnectionManager.send_message({
-            "type": "Login",
-            "message": "Se ha logueado"
-        },
-        user.id)
-    """
+
+    from services.web_socket_service import manager
+    
+    await manager.send_personal_message(
+        f"Se ha iniciado sesion en el sistema, bienvenido {user.first_name} ({datetime.now()})",
+        user.id
+    )
+
     # Crear tokens de acceso y refresco
     token_info = {"sub": user.id, "scopes": user.role_id}
     access_token = create_acess_token(data=token_info)
