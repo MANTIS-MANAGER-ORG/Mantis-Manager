@@ -66,7 +66,7 @@ async def websocket_endpoint(websocket: WebSocket, user_id: str):
                         else:
                             await manager.send_personal_message(
                                 {
-                                    "message": "Error al autenticar usuario.",
+                                    "message": "Error al autenticar usuario. No coincide el ID del usuario correcto.",
                                     "type":"error",
                                     "timestamp": datetime.now().isoformat()
                                 },

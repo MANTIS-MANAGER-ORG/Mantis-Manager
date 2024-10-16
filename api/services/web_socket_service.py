@@ -28,6 +28,17 @@ class NotificationManager:
             return notifications
         finally:
             session.close()
+            
+    async def exist_notifications(user_id: str):
+        session = next(get_db())
+        try:
+            data = session.query(Notification).filter(
+                Notification.user_id == user_id,
+                Notification.sent_by_app.is_(False)
+            ).all()
+            return len(data) > 0
+        finally:
+            session.close()
 
     @staticmethod
     def add_notification(user_id: str, message: str):
@@ -97,7 +108,6 @@ class ConnectionManager:
             # Verificar si el usuario está autenticado antes de enviar mensajes
             if not is_authenticated:
                 logger.warning(f"Usuario {user_id} no está autenticado. No se puede enviar el mensaje.")
-                await websocket.send_text("Aún no ha sido autenticado. Por favor autentíquese.")
                 NotificationManager.add_notification(user_id, message)
                 return
 
@@ -113,17 +123,15 @@ class ConnectionManager:
             logger.info(f"Mensaje almacenado para usuario {user_id}: {message}")
 
     async def send_pending_messages(self, user_id: str):
-        notifications = await NotificationManager.get_pending_messages(user_id)
-        if user_id in self.active_connections and notifications:
+        
+        if user_id in self.active_connections and await NotificationManager.exist_notifications(user_id):
             websocket, is_authenticated = self.active_connections[user_id]
 
             if not is_authenticated:
                 logger.warning(f"Usuario {user_id} no está autenticado. No se pueden enviar mensajes pendientes.")
                 await websocket.send_text("Aún no ha sido autenticado. No se pueden enviar mensajes pendientes.")
-                for message in notifications:
-                    NotificationManager.add_notification(user_id, message)
-                return
-
+                return            
+            notifications = await NotificationManager.get_pending_messages(user_id)
             for message in notifications:
                 try:
                     await websocket.send_text(message)
