@@ -16,7 +16,7 @@ class Registro(Base):
     __tablename__ = 'records'
     
     id = Column(Integer, Identity(start=1, increment=1), primary_key=True)  
-    description = Column(String, nullable=False)
+    description = Column(String(1000), nullable=False)
     created_at = Column(DateTime(timezone=True), server_default=func.now(), nullable=False)
     
     # Nuevo campo para el tipo de evento

@@ -23,8 +23,8 @@ class Notification(Base):
     __tablename__ = 'notifications'
 
     id = Column(Integer, primary_key=True, index=True)
-    user_id = Column(Integer, nullable=False)
-    message = Column(String, nullable=False)
+    user_id = Column(String(11), nullable=False)
+    message = Column(String(2000), nullable=False)
     sent_by_app = Column(Boolean, default=False)
     sent_by_email = Column(Boolean, default=False)
     created_at = Column(DateTime, default=datetime.utcnow)

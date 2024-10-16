@@ -1,6 +1,6 @@
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker, declarative_base
-from .settings import get_database_url
+from .config import get_database_url
 
 engine = create_engine(
                     get_database_url(),  # URL de conexión

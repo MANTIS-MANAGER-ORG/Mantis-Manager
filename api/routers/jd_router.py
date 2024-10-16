@@ -88,7 +88,7 @@ async def get_user_info(
     response_model=InfoUser
 )
 async def update_user_info(
-    user_id: int = Path(..., title="ID del usuario", description="ID del usuario a actualizar."),
+    user_id: str = Path(..., title="ID del usuario", description="ID del usuario a actualizar."),
     user_update: UserUpdate = None,
     token: str = Depends(HTTPBearer()),
     db: Session = Depends(get_db)
@@ -201,7 +201,7 @@ async def register(
     response_model=InfoUser
 )
 async def delete_user(
-    user_id: int = Path(..., title="ID del usuario", description="ID del usuario a eliminar."),
+    user_id: str = Path(..., title="ID del usuario", description="ID del usuario a eliminar."),
     token: str = Depends(HTTPBearer()),
     db: Session = Depends(get_db)
 ):

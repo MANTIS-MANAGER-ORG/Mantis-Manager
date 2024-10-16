@@ -23,12 +23,12 @@ class Machine(Base):
     __tablename__ = 'machine'
 
     id = Column(String(3), primary_key=True, unique=True, nullable=False)  
-    type = Column(String, nullable=False)
-    brand = Column(String, nullable=False)
-    model = Column(String, nullable=False)
-    serial = Column(String, unique=True, nullable=False)
-    description = Column(String, nullable=True)
-    action = Column(String, nullable=False)
+    type = Column(String(30), nullable=False)
+    brand = Column(String(50), nullable=False)
+    model = Column(String(50), nullable=False)
+    serial = Column(String(50), unique=True, nullable=False)
+    description = Column(String(1000), nullable=True)
+    action = Column(String(100), nullable=False)
 
     # Relación uno a muchos con Ticket
     tickets = relationship("Ticket", back_populates="machine")

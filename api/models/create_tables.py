@@ -1,5 +1,5 @@
 from config.db import engine, Base
-from models import Machine, Ticket, User, Role, Notification  # Importa todos los modelos
+from models import Machine, Ticket, User, Role, Notification, Registro  # Importa todos los modelos
 
 # Crea las tablas
 def create_tables():

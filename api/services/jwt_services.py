@@ -12,7 +12,7 @@ Existen dos tipos de tokens JWT: de acceso y de actualización.
 import jwt
 from datetime import datetime, timedelta, timezone
 from fastapi import HTTPException
-from config.settings import get_secret_key
+from config.config import get_secret_key
 
 SECRET_KEY = get_secret_key()
 ALGORITHM = "HS256"
