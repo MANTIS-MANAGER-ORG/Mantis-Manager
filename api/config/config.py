@@ -16,10 +16,9 @@ if environment == 'development':
         # Construye la URL de la base de datos    
             ruta = os.path.join('test.db')
             if not os.path.exists(ruta):
-                ruta = os.path.join('config/', 'test.db')
-
-            database_url = f"sqlite:///{ruta.replace('\\\\', '/')}"
-
+                ruta = os.path.join('config', 'test.db')
+            
+            database_url = f"sqlite:///{ruta}"  # No necesitas reemplazar '\\' por '/', usa os.path.join para mantener la consistencia de rutas
             return database_url
         else:
             # Si la base de datos es de producción
