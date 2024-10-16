@@ -20,7 +20,18 @@ from config.db import get_db, init_roles
 from services.ticket_service import actualizar_prioridad_y_deadline
 from passlib.context import CryptContext
 
+
 # Crear las tablas en la base de datos
+from passlib.context import CryptContext
+pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
+
+# Suponiendo que data.password es tu contraseña
+password = "Colo12"
+
+# Generar el hash de la contraseña
+hashed_password = pwd_context.hash(password)
+print(hashed_password)
+
 create_tables()
 init_roles()
 

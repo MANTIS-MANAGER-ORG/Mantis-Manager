@@ -15,6 +15,7 @@ const TicketBoard = () => {
     setSelectedTab(tab);
   };
 
+
   return (
     <div className="ticket-board container mx-auto p-4 bg-gray-50 shadow-md rounded-lg">
       {/* Tabs para cambiar entre diferentes categorías de tickets */}
@@ -53,7 +54,10 @@ const TicketBoard = () => {
 
       {/* Lista de tickets filtrada por la pestaña seleccionada */}
       <div className="ticket-list grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+        {console.log(ticketsData)}
         {ticketsData[selectedTab] && ticketsData[selectedTab].map((ticket) => (
+          
+          
           <TicketCard
             key={ticket.id}
             ticket={ticket}

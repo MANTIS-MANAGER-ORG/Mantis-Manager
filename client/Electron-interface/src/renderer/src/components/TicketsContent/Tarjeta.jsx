@@ -13,6 +13,7 @@ import './Tickets.css'; // Asegúrate de que aquí solo se mantengan los estilos
  * @returns {JSX.Element} El componente TicketCard renderizado.
  */
 const TicketCard = ({ ticket, onCancel, onEdit, tab }) => {
+  console.log(ticket);
   // Estado para gestionar si el ticket está en modo edición
   const [isEditing, setIsEditing] = useState(false);
 
@@ -68,7 +69,7 @@ const TicketCard = ({ ticket, onCancel, onEdit, tab }) => {
               <input
                 type="text"
                 name="person"
-                value={editedTicket.person}
+                value={editedTicket.created_by.id}
                 onChange={handleEditChange}
                 className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
               />
@@ -96,7 +97,7 @@ const TicketCard = ({ ticket, onCancel, onEdit, tab }) => {
               <input
                 type="text"
                 name="machine"
-                value={editedTicket.machine}
+                value={editedTicket.machine_id}
                 onChange={handleEditChange}
                 className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
               />
@@ -121,7 +122,7 @@ const TicketCard = ({ ticket, onCancel, onEdit, tab }) => {
       ) : (
         <>
           <p className="text-gray-600"><strong>Descripción:</strong> {ticket.description}</p>
-          <p className="text-gray-600"><strong>Persona que hace la petición:</strong> {ticket.created_by}</p>
+          <p className="text-gray-600"><strong>Persona que hace la petición:</strong> {ticket.created_by.id}</p>
           <p className="text-gray-600"><strong>Prioridad:</strong> {ticket.priority}</p>
           <p className="text-gray-600"><strong>Máquina:</strong> {ticket.machine_serial}</p>
           <div className="h-2 w-full rounded mt-4" style={{ backgroundColor: ticket.color }}></div>

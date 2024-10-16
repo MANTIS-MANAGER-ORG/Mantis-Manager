@@ -19,6 +19,7 @@ const api = {
 
     try {
   
+      
       // Aquí hacemos la solicitud a la API usando el contexto de Electron
       const response = await fetch(url, options);
       

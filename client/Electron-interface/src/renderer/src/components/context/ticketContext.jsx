@@ -17,11 +17,14 @@ export const TicketProvider = ({ children }) => {
   };
 
   const fetchTickets = async () => {
-    const url = "http://127.0.0.1:8000/seguimiento";
+    const page=parseInt(1)
+    const limit=parseInt(10)
+    const url = `http://127.0.0.1:8000/tickets/tickets?page=${page}&limit=${limit}`;
 
     try {
       const data = await fetchApi(url, 'GET'); // Usar el hook de API
-      const pendientes = data.length > 0 ? data.filter(data => data.state === "pendiente") : [];
+  
+      const pendientes = data.tickets.length > 0 ? data.tickets.filter(i => i.state === "pendiente") : [];
 
       setTicketsData(prevTickets => ({
         ...prevTickets,
@@ -41,7 +44,7 @@ export const TicketProvider = ({ children }) => {
       priority: newTicket.priority,
     };
 
-    const url = "http://127.0.0.1:8000/ticket"; // URL de la API
+    const url = "http://127.0.0.1:8000/tickets/ticket"; // URL de la API
 
     try {
       console.log(ticketData);
