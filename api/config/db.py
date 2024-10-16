@@ -22,7 +22,8 @@ def get_db():
      
 def init_roles():
     # La importación de Role ocurre aquí dentro de la función, para evitar la importación circular
-    from models.user_model import Role  
+    from models.user_model import Role, User
+    from passlib.context import CryptContext
     session = SessionLocal()
     try:
         roles = ["Jefe de Desarrollo", "Operario de Mantenimiento", "Operario de Maquinaria", "Jefe de Mantenimiento"]
@@ -31,13 +32,28 @@ def init_roles():
             if not existing_role:
                 new_role = Role(name=role_name)
                 session.add(new_role)
+                
+        pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")        
+                
+        hashed_password = pwd_context.hash('admin')        
+                
+        new_user = User(
+            id='admin',
+            password=hashed_password,
+            first_name='Admin',
+            last_name='User',
+            email='admin@mantis.com',
+            phone='1234567890',
+            role_id=1  # Asegúrate de asignar el rol de jefe de desarrollo
+        )
+        session.add(new_user)
+            
         session.commit()
     except Exception as e:
         print(f"Error al inicializar roles: {e}")
         session.rollback()
     finally:
         session.close()
-
 
 if __name__ == "__main__":    
     from sqlalchemy import text
