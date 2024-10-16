@@ -10,6 +10,7 @@ from config.db import get_db
 from models.user_model import User
 from schemas.user_schema import LoginData, LoginResponse
 from services.jwt_services import create_acess_token, create_refresh_token
+from services.web_socket_service import manager
 
 # Crear un objeto de contexto de cifrado con bcrypt
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
@@ -60,11 +61,13 @@ async def login(
         "phone": user.phone,
         "role_id": user.role_id
     }
-
-    from services.web_socket_service import manager
     
     await manager.send_personal_message(
-        f"Se ha iniciado sesion en el sistema, bienvenido {user.first_name} ({datetime.now()})",
+        {
+            "message": f"Se ha iniciado sesion en el sistema, bienvenido {user.first_name}.",
+            "type": "info",
+            "timestamp": datetime.now().isoformat()
+        },
         user.id
     )
 
@@ -79,6 +82,5 @@ async def login(
         access_token=access_token,
         refresh_token=refresh_token
     )
-
 
     return response

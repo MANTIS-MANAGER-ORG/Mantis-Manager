@@ -8,6 +8,7 @@ from fastapi.security import HTTPBearer
 from sqlalchemy import func
 from sqlalchemy.orm import Session
 
+from services.web_socket_service import manager
 from config.db import get_db
 from models.historial_model import Registro
 from models.machine_model import Machine
@@ -207,6 +208,15 @@ async def create_ticket(
     db.add(new_registro)
     db.commit()
     
+    await manager.send_personal_message(
+        {
+            "message": f"Has creado un nuevo ticket con ID {new_ticket.id} para la máquina {machine.id}.",
+            "type":"info",
+            "timestamp": datetime.now().isoformat()
+        },
+        user_id
+    )
+    
     # Retornar la información del ticket creado
     return TicketStandartResponse(
         id=new_ticket.id,
@@ -366,6 +376,15 @@ async def assign_ticket(
                 "type": solicitud.type
             }
             related_open_requests.append(solicitud_data)
+            
+    await manager.send_personal_message(
+        {
+            "message": f"Se ha asignado tu ticket con id {ticket.id} para la maquina {ticket.machine_id} a {user.first_name} {user.last_name}. (id: {user.id})",
+            "type":"info",
+            "timestamp": datetime.now().isoformat()
+        },
+        ticket.created_by
+    )
     
     return TicketStandartResponse(
         id=ticket.id,

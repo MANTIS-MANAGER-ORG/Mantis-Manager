@@ -11,7 +11,7 @@ import json
 
 class NotificationManager:
     @staticmethod
-    async def get_pending_messages(user_id: int):
+    async def get_pending_messages(user_id: str):
         session = next(get_db())
         try:
             data = session.query(Notification).filter(
@@ -33,7 +33,7 @@ class NotificationManager:
             session.close()
 
     @staticmethod
-    def add_notification(user_id: int, message: str):
+    def add_notification(user_id: str, message: str):
         session = next(get_db())
         try:
             if isinstance(message, dict):
@@ -77,7 +77,10 @@ class ConeccionManager:
                 logger.error(f"Error al cerrar la conexión WebSocket para usuario {user_id}: {e}")
             del self.active_connections[user_id]
 
-    async def send_personal_message(self, message: str, user_id: str):
+    async def send_personal_message(self, message: str | dict, user_id: str):
+        if isinstance(message, dict):
+            message = json.dumps(message)
+
         if user_id in self.active_connections:
             try:
                 await self.active_connections[user_id].send_text(message)
@@ -93,7 +96,7 @@ class ConeccionManager:
             logger.info(f"Mensaje almacenado para usuario {user_id}: {message}")
 
     async def send_pending_messages(self, user_id: str):
-        notifications = await NotificationManager.get_pending_messages(int(user_id))
+        notifications = await NotificationManager.get_pending_messages(user_id)
         if user_id in self.active_connections and notifications:
             for message in notifications:
                 try:
@@ -104,6 +107,11 @@ class ConeccionManager:
                     # Si falla al enviar, volver a almacenar el mensaje
                     NotificationManager.add_notification(int(user_id), message)
                     logger.info(f"Mensaje re-almacenado para usuario {user_id} debido a error al enviar.")
+        else:
+            try:
+                await self.active_connections[user_id].send_text("No hay mensajes pendientes.")
+            except Exception as e:
+                logger.error(f"Error al enviar mensaje de no hay mensajes pendientes a usuario {user_id}: {e}")
     
     async def broadcast(self, message: str):
         for user_id, connection in self.active_connections.items():
