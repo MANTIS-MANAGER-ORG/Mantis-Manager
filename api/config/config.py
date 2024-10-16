@@ -1,6 +1,7 @@
 import os
 
 environment = os.getenv('ENVIRONMENT', 'production')
+print(f"Environment: {environment}")
 
 if environment == 'development':
     from dotenv import load_dotenv
@@ -17,7 +18,8 @@ if environment == 'development':
             if not os.path.exists(ruta):
                 ruta = os.path.join('config/', 'test.db')
 
-            database_url = f"sqlite:///{ruta.replace('\\', '/')}"
+            database_url = f"sqlite:///{ruta.replace('\\\\', '/')}"
+
             return database_url
         else:
             # Si la base de datos es de producción
