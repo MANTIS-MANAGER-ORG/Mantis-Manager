@@ -1,6 +1,6 @@
 import os
 
-environment = os.getenv('ENVIRONMENT', 'development')
+environment = os.getenv('ENVIRONMENT', 'production')
 
 if environment == 'development':
     from dotenv import load_dotenv
