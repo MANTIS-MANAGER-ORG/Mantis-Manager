@@ -1,32 +1,27 @@
-import React, { useState, useEffect } from 'react';
-import { HiOutlineEye } from 'react-icons/hi'; // Icono minimalista de ojo
-import TicketsDetails from './TicketsDetails'; // Importa el componente de detalles
+import React, { useState } from 'react';
+import { HiOutlineEye } from 'react-icons/hi';
+import { useTicketContext } from '../context/ticketContext'; // Importamos el contexto
+import TicketsDetails from './TicketsDetails';
 
 const TicketList = () => {
-  const [tickets, setTickets] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [selectedTicket, setSelectedTicket] = useState(null); // Ticket seleccionado
-  const [openModal, setOpenModal] = useState(false); // Control del modal
+  const { ticketsData, loading } = useTicketContext(); // Usamos el contexto
+  const [selectedTicket, setSelectedTicket] = useState(null);
+  const [openModal, setOpenModal] = useState(false);
+  const [currentTab, setCurrentTab] = useState('En cola');
 
-  useEffect(() => {
-    // Simula la carga de tickets
-    setTimeout(() => {
-      setTickets([
-        { id: 1, description: 'Ticket 1', status: 'En cola' },
-        { id: 2, description: 'Ticket 2', status: 'En proceso' },
-        { id: 3, description: 'Ticket 3', status: 'Terminados' },
-      ]);
-      setLoading(false);
-    }, 1000);
-  }, []);
+  // Asegúrate de que `ticketsData[currentTab]` existe y es un array
+  if (!ticketsData[currentTab]) {
+    return <div>No hay datos disponibles para la pestaña actual.</div>;
+  }
 
+  // Estado inicial para las pestañas
   const handleSelectTicket = (ticket) => {
     setSelectedTicket(ticket);
-    setOpenModal(true); // Abre el modal
+    setOpenModal(true);
   };
 
   const handleCloseModal = () => {
-    setOpenModal(false); // Cierra el modal
+    setOpenModal(false);
   };
 
   if (loading) {
@@ -38,9 +33,23 @@ const TicketList = () => {
   }
 
   return (
-    <div className="flex flex-col  items-center min-h-screen ">
-      <div className="bg-white p-8 rounded-lg   w-full">
+    <div className="flex flex-col items-center min-h-screen ">
+      <div className="bg-white p-8 rounded-lg w-full">
         <h1 className="text-3xl font-bold text-center mb-8">Tickets List</h1>
+        {/* Tabs for ticket states */}
+        <div className="flex justify-around mb-4">
+          {Object.keys(ticketsData).map((tab) => (
+            <button
+              key={tab}
+              className={`px-4 py-2 ${
+                currentTab === tab ? 'bg-blue-500 text-white' : 'text-blue-500'
+              }`}
+              onClick={() => setCurrentTab(tab)}
+            >
+              {tab}
+            </button>
+          ))}
+        </div>
         <div className="overflow-x-auto">
           <table className="min-w-full border-collapse">
             <thead>
@@ -49,26 +58,23 @@ const TicketList = () => {
                 <th className="py-4 px-6 text-left">Description</th>
                 <th className="py-4 px-6 text-left">Estado</th>
                 <th className="py-4 px-6 text-left">Acciones</th>
+                <th className="py-4 px-6 text-left">Solicitudes</th>
+                <th className="py-4 px-6 text-left">Asignado</th>
               </tr>
             </thead>
             <tbody>
-              {tickets.map((ticket) => (
+              {ticketsData[currentTab].map((ticket) => (
                 <tr key={ticket.id} className="hover:bg-gray-50">
                   <td className="py-4 px-6 text-left">{ticket.id}</td>
                   <td className="py-4 px-6">{ticket.description}</td>
                   <td
                     className={`py-4 px-6 text-left ${
-                      ticket.status === 'En cola'
-                        ? 'text-red-500'
-                        : ticket.status === 'Terminados'
-                        ? 'text-green-500'
-                        : 'text-orange-500'
+                      ticket.state === 'pendiente' ? 'text-red-500' : 'text-green-500'
                     }`}
                   >
-                    {ticket.status}
+                    {ticket.state}
                   </td>
                   <td className="py-4 px-10 text-left">
-                    {/* Botón para ver detalles */}
                     <button
                       onClick={() => handleSelectTicket(ticket)}
                       className="text-blue-500 hover:text-blue-700 transition-all"
@@ -76,6 +82,8 @@ const TicketList = () => {
                       <HiOutlineEye size={24} />
                     </button>
                   </td>
+                  <td>No hay solicitudes</td>
+                  <td>{ticket?.assigned_to?.id ? ticket.assigned_to.id : 'No asignado'}</td>
                 </tr>
               ))}
             </tbody>
@@ -87,14 +95,12 @@ const TicketList = () => {
       {openModal && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center">
           <div className="bg-white p-6 rounded-lg shadow-lg relative max-w-md w-full">
-            {/* Cerrar el modal */}
             <button
               className="absolute top-2 right-2 text-gray-500 hover:text-gray-700"
               onClick={handleCloseModal}
             >
               &times;
             </button>
-            {/* Mostrar los detalles del ticket */}
             {selectedTicket && <TicketsDetails ticket={selectedTicket} />}
           </div>
         </div>
@@ -104,3 +110,6 @@ const TicketList = () => {
 };
 
 export default TicketList;
+
+
+
