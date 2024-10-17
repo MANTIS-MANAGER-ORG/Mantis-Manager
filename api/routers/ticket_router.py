@@ -356,6 +356,7 @@ async def assign_ticket(
         raise HTTPException(status_code=404, detail="Usuario al que se le asignara el ticket no encontrado")
     
     ticket.assigned_to = user.id
+    ticket.state = "asignado"
     db.commit()
     db.refresh(ticket)
     
