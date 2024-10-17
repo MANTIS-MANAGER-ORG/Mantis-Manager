@@ -43,9 +43,9 @@ const TicketBoard = () => {
               ? "bg-yellow-500 text-white"
               : "bg-white text-yellow-500 border border-yellow-500 hover:bg-yellow-100"
           }`}
-          onClick={() => handleTabClick("En proceso")}
+          onClick={() => handleTabClick("Asignado")}
         >
-          En proceso
+          Asignado
         </button>
         <button
           className={`py-2 px-4 rounded-full focus:outline-none transition duration-300 ${
@@ -53,9 +53,9 @@ const TicketBoard = () => {
               ? "bg-green-500 text-white"
               : "bg-white text-green-500 border border-green-500 hover:bg-green-100"
           }`}
-          onClick={() => handleTabClick("Terminados")}
+          onClick={() => handleTabClick("En proceso")}
         >
-          Terminados
+          En proceso
         </button>
       </div>
 

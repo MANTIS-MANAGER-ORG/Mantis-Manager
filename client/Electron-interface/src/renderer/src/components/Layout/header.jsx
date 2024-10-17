@@ -57,7 +57,7 @@ const Header = ({ onTabChange }) => {
             
 
           )}
-          {userRole === 4 && (
+          {(userRole === 4 || userRole === 2)&& (
             <button onClick={() => onTabChange('Gestion ticktes')} className="text-gray-300 hover:text-white transition duration-300">
               Gestión Ticktes
             </button>

@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { HiOutlineEye } from 'react-icons/hi';
 import { useTicketContext } from '../context/ticketContext'; // Importamos el contexto
-import TicketsDetails from './TicketsDetails';
+import TicketDetails from './TicketsDetails'; // Cambiado el nombre a singular
 
 const TicketList = () => {
   const { ticketsData, loading } = useTicketContext(); // Usamos el contexto
@@ -14,12 +14,14 @@ const TicketList = () => {
     return <div>No hay datos disponibles para la pestaña actual.</div>;
   }
 
+
   // Estado inicial para las pestañas
   const handleSelectTicket = (ticket) => {
     setSelectedTicket(ticket);
     setOpenModal(true);
   };
 
+  console.log (Object.keys(ticketsData));
   const handleCloseModal = () => {
     setOpenModal(false);
   };
@@ -39,6 +41,7 @@ const TicketList = () => {
         {/* Tabs for ticket states */}
         <div className="flex justify-around mb-4">
           {Object.keys(ticketsData).map((tab) => (
+            
             <button
               key={tab}
               className={`px-4 py-2 ${
@@ -101,7 +104,7 @@ const TicketList = () => {
             >
               &times;
             </button>
-            {selectedTicket && <TicketsDetails ticket={selectedTicket} />}
+            {selectedTicket && <TicketDetails ticket={selectedTicket} />} {/* TicketDetails componente */}
           </div>
         </div>
       )}

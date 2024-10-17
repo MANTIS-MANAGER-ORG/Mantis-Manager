@@ -96,30 +96,29 @@ const TicketDetails = ({ ticket }) => {
         {/* Botón de asignar ticket */}
         <button
           className={`${
-            ticket.assigned_to
-              ? 'bg-gray-400 cursor-not-allowed'
-              : 'bg-blue-500 hover:bg-blue-600'
-          } text-white font-bold py-2 px-4 rounded-lg transition`}
-          onClick={handleAssign} // Llama a la función de asignación
+            ticket.assigned_to ? 'bg-gray-500 cursor-not-allowed' : 'bg-blue-500'
+          } text-white px-4 py-2 rounded-lg shadow-sm`}
+          onClick={handleAssign}
           disabled={!!ticket.assigned_to} // Deshabilita si ya tiene asignado
         >
-          {ticket.assigned_to ? 'Ya Asignado' : 'Asignar Ticket'}
+          {ticket.assigned_to ? 'Ya Asignado' : 'Asignar'}
         </button>
 
-        {/* Botón de cambiar estado */}
-        {!isEditingStatus ? (
+        {/* Botón para editar el estado */}
+        <button
+          className="bg-yellow-500 text-white px-4 py-2 rounded-lg shadow-sm"
+          onClick={() => setIsEditingStatus(!isEditingStatus)}
+        >
+          Editar Estado
+        </button>
+
+        {/* Guardar estado */}
+        {isEditingStatus && (
           <button
-            className="bg-blue-500 text-white font-bold py-2 px-4 rounded-lg hover:bg-blue-600 transition"
-            onClick={() => setIsEditingStatus(true)}
+            className="bg-green-500 text-white px-4 py-2 rounded-lg shadow-sm"
+            onClick={handleStatusChange}
           >
-            Cambiar Estado
-          </button>
-        ) : (
-          <button
-            className="bg-green-500 text-white font-bold py-2 px-4 rounded-lg hover:bg-green-600 transition"
-            onClick={handleStatusChange} // Llama a la función de cambio de estado
-          >
-            Enviar Cambios
+            Guardar Estado
           </button>
         )}
       </div>

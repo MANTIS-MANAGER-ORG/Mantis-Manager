@@ -5,11 +5,15 @@ const TicketContext = createContext();
 
 export const TicketProvider = ({ children }) => {
   const { fetchApi, loading, error } = useApi();
-  const [ticketsData, setTicketsData] = useState({ "En cola": [], "En proceso": [], "Terminados": [] });
+  const [ticketsData, setTicketsData] = useState({
+    "En cola": [],
+    "Asignado": [],
+    "En proceso": [],
+  });
   const [showGenerarTickets, setShowGenerarTickets] = useState(false);
   const [history, setHistory] = useState([]);
   const [page, setCurrentPage] = useState(1);
-  const [hasMoreTickets, setHasMoreTickets] = useState(true); 
+  const [hasMoreTickets, setHasMoreTickets] = useState(true);
 
   const recordHistory = (ticketId, action) => {
     const date = new Date().toLocaleDateString();
@@ -20,17 +24,19 @@ export const TicketProvider = ({ children }) => {
     const url = `http://127.0.0.1:8000/tickets/tickets?page=${page}&limit=${limit}`;
 
     try {
-      const data = await fetchApi(url, 'GET');
-      const pendientes = data.tickets.length > 0 ? data.tickets.filter(i => i.state === "pendiente") : [];
+      const data = await fetchApi(url, "GET");
+      const pendientes = data.tickets.filter((ticket) => ticket.state === "pendiente");
+      const enProceso = data.tickets.filter((ticket) => ticket.state === "en proceso");
+      const asignados = data.tickets.filter((ticket) => ticket.state === "asignado");
+
       const moreTickets = data.tickets.length === limit;
       setHasMoreTickets(moreTickets);
 
-      setTicketsData((prevTickets) => ({
-        ...prevTickets,
+      setTicketsData({
         "En cola": [...pendientes],
-        "En proceso": [], 
-        "Terminados": [] 
-      }));
+        "Asignado": [...asignados],
+        "En proceso": [...enProceso],
+      });
     } catch (error) {
       console.error("Error al cargar los tickets:", error);
     }
@@ -45,12 +51,12 @@ export const TicketProvider = ({ children }) => {
     const url = "http://127.0.0.1:8000/tickets/ticket";
 
     try {
-      const createdTicket = await fetchApi(url, 'POST', ticketData);
+      const createdTicket = await fetchApi(url, "POST", ticketData);
       setTicketsData((prevData) => ({
         ...prevData,
-        "En cola": [...prevData["En cola"], createdTicket]
+        "En cola": [...prevData["En cola"], createdTicket],
       }));
-      recordHistory(createdTicket.id, 'Creado');
+      recordHistory(createdTicket.id, "Creado");
     } catch (error) {
       console.error("Error al crear el ticket:", error);
     }
@@ -58,9 +64,9 @@ export const TicketProvider = ({ children }) => {
 
   const handleCancel = async (ticketId, tab) => {
     const updatedData = { ...ticketsData };
-    updatedData[tab] = updatedData[tab].filter(ticket => ticket.id !== ticketId);
-    setTicketsData(updatedData); 
-    recordHistory(ticketId, 'Cancelado');
+    updatedData[tab] = updatedData[tab].filter((ticket) => ticket.id !== ticketId);
+    setTicketsData(updatedData);
+    recordHistory(ticketId, "Cancelado");
   };
 
   const handleEdit = async (editedTicket) => {
@@ -70,8 +76,8 @@ export const TicketProvider = ({ children }) => {
         ticket.id === editedTicket.id ? editedTicket : ticket
       );
     });
-    setTicketsData(updatedData); 
-    recordHistory(editedTicket.id, 'Editado');
+    setTicketsData(updatedData);
+    recordHistory(editedTicket.id, "Editado");
   };
 
   const toggleGenerarTickets = () => {
@@ -96,60 +102,73 @@ export const TicketProvider = ({ children }) => {
       fetchTickets(nextPage);
     }
   };
+
   const changeTicketState = async (ticketId, newState) => {
-    // Verifica si el estado es válido
-    const validStates = ['asignado', 'en proceso', 'pendiente'];
+    const validStates = ["asignado", "en proceso", "pendiente"];
     if (!validStates.includes(newState)) {
-      console.error('Estado no válido:', newState);
+      console.error("Estado no válido:", newState);
       return;
     }
-  
-    // URL con la estructura adecuada para cambiar el estado
+
     const url = `http://127.0.0.1:8000/tickets/ticket/${ticketId}/${newState}`;
-  
+
     try {
-      // Realiza la solicitud PATCH sin autenticación
-      const response = await fetchApi(url, 'PATCH')
-  
-      // Manejo de respuestas
+      const response = await fetchApi(url, "PATCH");
+
       if (response.ok) {
-        const data = await response.json();
-        console.log('Ticket actualizado:', data);
+        const updatedTicket = await response.json();
+
+        setTicketsData((prevData) => {
+          const updatedTickets = { ...prevData };
+
+          // Elimina el ticket de su estado actual
+          Object.keys(updatedTickets).forEach((tab) => {
+            updatedTickets[tab] = updatedTickets[tab].filter((ticket) => ticket.id !== ticketId);
+          });
+
+          // Añade el ticket al nuevo estado
+          if (newState === "pendiente") {
+            updatedTickets["En cola"].push(updatedTicket);
+          } else if (newState === "en proceso") {
+            updatedTickets["En proceso"].push(updatedTicket);
+          } else if (newState === "asignado") {
+            updatedTickets["Asignado"].push(updatedTicket);
+          }
+
+          return updatedTickets;
+        });
+
+        console.log("Ticket actualizado:", updatedTicket);
       } else {
         const errorData = await response.json();
-        console.error('Error al cambiar el estado del ticket:', errorData);
+        console.error("Error al cambiar el estado del ticket:", errorData);
       }
     } catch (error) {
-      console.error('Error en la solicitud:', error);
+      console.error("Error en la solicitud:", error);
     }
   };
-
-
-
 
   const AsignedTicket = async (id, assigned) => {
-    console.log(id, typeof id)
-    console.log(assigned, typeof assigned)
-
-
-    // URL con parámetros de consulta
     const url = `http://127.0.0.1:8000/tickets/ticket/assing/${String(id)}?user_id=${String(assigned)}`;
 
-    console.log(url);
-
-  
     try {
-      const data = await fetchApi(url, 'PATCH');
-      setTicketsData((prevData) => ({
-        ...prevData,
-        "En proceso": [],// cuando se asigna pasa automaticamente a en proceso 
-      }));
+      const updatedTicket = await fetchApi(url, "PATCH");
+
+      setTicketsData((prevData) => {
+        const updatedTickets = { ...prevData };
+
+        // Elimina el ticket de "En cola" y agrégalo a "En proceso"
+        updatedTickets["En cola"] = updatedTickets["En cola"].filter((ticket) => ticket.id !== id);
+        updatedTickets["En proceso"].push(updatedTicket);
+
+        return updatedTickets;
+      });
+
+      console.log('Ticket asignado y movido a "En proceso"');
     } catch (error) {
-      console.error("Error al cargar los tickets:", error);
+      console.error("Error al asignar el ticket:", error);
     }
   };
-  
-
 
   return (
     <TicketContext.Provider
@@ -168,7 +187,7 @@ export const TicketProvider = ({ children }) => {
         loading,
         hasMoreTickets,
         AsignedTicket,
-        changeTicketState, // función para cambiar el estado del ticket
+        changeTicketState,
       }}
     >
       {children}
@@ -177,6 +196,4 @@ export const TicketProvider = ({ children }) => {
 };
 
 export const useTicketContext = () => useContext(TicketContext);
-
-
 
