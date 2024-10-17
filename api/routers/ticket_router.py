@@ -562,7 +562,7 @@ async def request_ticket_closure(
 
     user_id = req.state.user.get("sub")
     
-    if ticket.created_by != user_id:
+    if ticket.assigned_to != user_id:
         raise HTTPException(status_code=403, detail="No tienes permiso para realizar esta acción (No eres el creador del ticket).")
     
     # Serializar la información en JSON

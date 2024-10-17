@@ -37,17 +37,19 @@ def init_roles():
                 
         hashed_password = pwd_context.hash('admin')        
                 
-        new_user = User(
-            id='admin',
-            password=hashed_password,
-            first_name='Admin',
-            last_name='User',
-            email='admin@mantis.com',
-            phone='1234567890',
-            role_id=1  # Asegúrate de asignar el rol de jefe de desarrollo
-        )
-        session.add(new_user)
-            
+        existing_user = session.query(User).filter_by(id='admin').first()        
+           
+        if not existing_user:     
+            new_user = User(
+                id='admin',
+                password=hashed_password,
+                first_name='Admin',
+                last_name='User',
+                email='admin@mantis.com',
+                phone='1234567890',
+                role_id=1  # Asegúrate de asignar el rol de jefe de desarrollo
+            )
+            session.add(new_user)
         session.commit()
     except Exception as e:
         print(f"Error al inicializar roles: {e}")
