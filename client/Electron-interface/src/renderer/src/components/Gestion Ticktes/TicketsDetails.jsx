@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { useTicketContext } from '../context/ticketContext'; // Importa el contexto
 
 const TicketDetails = ({ ticket }) => {
-  const { AsignedTicket, changeTicketState } = useTicketContext(); // Usa las funciones del contexto
+  const { AsignedTicket, changeTicketState, createRequest } = useTicketContext(); // Usa createRequest
   const [assignedTo, setAssignedTo] = useState(''); // Estado para almacenar el ID del usuario asignado
   const [newStatus, setNewStatus] = useState(ticket.state); // Estado para cambiar el estado del ticket
   const [isEditingStatus, setIsEditingStatus] = useState(false); // Estado para controlar la edición del estado
@@ -12,7 +12,7 @@ const TicketDetails = ({ ticket }) => {
   const handleAssign = async () => {
     if (assignedTo) {
       try {
-        console.log(ticket.id, assignedTo)
+        console.log(ticket.id, assignedTo);
         await AsignedTicket(String(ticket.id), assignedTo); // Usa la función del contexto
         setMessage(`Ticket asignado al usuario con ID: ${assignedTo}`);
       } catch (error) {
@@ -31,6 +31,26 @@ const TicketDetails = ({ ticket }) => {
       setIsEditingStatus(false); // Oculta el campo de edición del estado
     } catch (error) {
       setMessage('Error al actualizar el estado del ticket');
+    }
+  };
+
+  // Maneja la solicitud de cierre del ticket
+  const handleCloseRequest = async () => {
+    try {
+      await createRequest(ticket.id, 'close', 'cierre'); // Usa createRequest para solicitar el cierre
+      setMessage('Solicitud de cierre enviada');
+    } catch (error) {
+      setMessage('Error al solicitar el cierre del ticket');
+    }
+  };
+
+  // Maneja la solicitud de reapertura del ticket
+  const handleReopenRequest = async () => {
+    try {
+      await createRequest(ticket.id, 'reopen'); // Usa createRequest para solicitar la reapertura
+      setMessage('Solicitud de reapertura enviada');
+    } catch (error) {
+      setMessage('Error al solicitar la reapertura del ticket');
     }
   };
 
@@ -122,11 +142,37 @@ const TicketDetails = ({ ticket }) => {
           </button>
         )}
       </div>
+
+      {/* Botones de solicitud de cierre y reapertura */}
+      <div className="mt-4 flex space-x-4">
+        {/* Botón de Solicitud de Cierre */}
+        <button
+          className={`${
+            ticket.state !== 'en proceso' ? 'bg-gray-500 cursor-not-allowed' : 'bg-red-500'
+          } text-white px-4 py-2 rounded-lg shadow-sm`}
+          onClick={handleCloseRequest}
+          disabled={ticket.state !== 'en proceso'} // Deshabilita si el estado no es "en proceso"
+        >
+          Solicitar Cierre
+        </button>
+
+        {/* Botón de Solicitud de Reapertura */}
+        <button
+          className={`${
+            ticket.state !== 'terminado' ? 'bg-gray-500 cursor-not-allowed' : 'bg-green-500'
+          } text-white px-4 py-2 rounded-lg shadow-sm`}
+          onClick={handleReopenRequest}
+          disabled={ticket.state !== 'terminado'} // Deshabilita si el estado no es "terminado"
+        >
+          Solicitar Reapertura
+        </button>
+      </div>
     </div>
   );
 };
 
 export default TicketDetails;
+
 
 
 

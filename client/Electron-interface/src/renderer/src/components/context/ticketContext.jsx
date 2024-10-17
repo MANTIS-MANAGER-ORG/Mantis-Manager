@@ -170,6 +170,69 @@ export const TicketProvider = ({ children }) => {
     }
   };
 
+  // Función para crear una solicitud de cierre o reapertura
+  const createRequest = async (ticketId, description, type) => {
+    const requestData = {
+      description,
+      type, // 'cierre' o 'apertura'
+      ticket_id: ticketId,
+    };
+    
+
+    const url = "http://127.0.0.1:8000/solicitudes";
+
+    try {
+      console.log(requestData);
+      const createdRequest = await fetchApi(url, "POST", requestData);
+      console.log("Solicitud creada:", createdRequest);
+      return createdRequest;
+    } catch (error) {
+      console.error("Error al crear la solicitud:", error);
+    }
+  };
+
+
+  const getRequest= async (id=null) => {
+    let url;
+    id? url=`http://127.0.0.1:8000/solicitudes/${id}`:  url='http://127.0.0.1:8000/solicitudes'
+    try{
+    const data = await fetchApi(url, "GET",);
+    return data
+    
+    }catch (error) {
+      console.log(error);
+
+  
+  
+  
+  
+  }
+
+};
+
+const respondeRequest = async (id, response) => {
+  const url = `http://127.0.0.1:8000/solicitudes/${id}/responder`;
+  const body={
+    'status': response
+
+  }
+
+  try{
+    const data = await fetchApi(url, "PATCH",body);
+    if(data){
+      console.log("la solicitud se respondió con exito")
+    }
+
+  }catch (error) {
+    console.log(error);
+
+  }
+
+
+
+
+};
+
   return (
     <TicketContext.Provider
       value={{
@@ -188,6 +251,9 @@ export const TicketProvider = ({ children }) => {
         hasMoreTickets,
         AsignedTicket,
         changeTicketState,
+        createRequest, // Exponemos la función para crear solicitudes
+        getRequest, // Exponemos la función para obtener solicitudes 
+        respondeRequest
       }}
     >
       {children}
@@ -196,4 +262,3 @@ export const TicketProvider = ({ children }) => {
 };
 
 export const useTicketContext = () => useContext(TicketContext);
-

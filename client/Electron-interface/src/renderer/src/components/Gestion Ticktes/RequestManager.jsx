@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import RequestList from './RequestList';
-import RequestDetails from './RequestDetails';
+import RequestDetails from './RequestList';
 
 
 import { Grid, Typography, Box } from '@mui/material';
@@ -14,24 +14,17 @@ const RequestsManager = () => {
   };
 
   return (
-    <Box>
-      <Typography variant="h4" gutterBottom>
-        Request Management
-      </Typography>
+    
+     
 
-      <Grid container spacing={3}>
-        <Grid item xs={6}>
+      <div className='flex '>
+        
           <RequestList onSelectRequest={handleSelectRequest} />
-        </Grid>
-        <Grid item xs={6}>
-          {selectedRequest ? (
-            <RequestDetails request={selectedRequest} />
-          ) : (
-            <Typography>Select a request to view details</Typography>
-          )}
-        </Grid>
-      </Grid>
-    </Box>
+        
+          
+        
+      </div>
+    
   );
 };
 

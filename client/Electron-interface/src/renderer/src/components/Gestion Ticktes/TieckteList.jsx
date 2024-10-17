@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { HiOutlineEye } from 'react-icons/hi';
 import { useTicketContext } from '../context/ticketContext'; // Importamos el contexto
-import TicketDetails from './TicketsDetails'; // Cambiado el nombre a singular
+import TicketDetails from './TicketsDetails'; 
 
 const TicketList = () => {
   const { ticketsData, loading } = useTicketContext(); // Usamos el contexto
@@ -61,7 +61,7 @@ const TicketList = () => {
                 <th className="py-4 px-6 text-left">Description</th>
                 <th className="py-4 px-6 text-left">Estado</th>
                 <th className="py-4 px-6 text-left">Acciones</th>
-                <th className="py-4 px-6 text-left">Solicitudes</th>
+                
                 <th className="py-4 px-6 text-left">Asignado</th>
               </tr>
             </thead>
@@ -85,7 +85,7 @@ const TicketList = () => {
                       <HiOutlineEye size={24} />
                     </button>
                   </td>
-                  <td>No hay solicitudes</td>
+                  
                   <td>{ticket?.assigned_to?.id ? ticket.assigned_to.id : 'No asignado'}</td>
                 </tr>
               ))}
