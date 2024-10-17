@@ -81,6 +81,7 @@ const TicketDetails = ({ ticket }) => {
           value={assignedTo}
           onChange={(e) => setAssignedTo(e.target.value)}
           placeholder="Ingrese ID del usuario"
+          disabled={!!ticket.assigned_to} // Deshabilita si ya tiene asignado
         />
       </div>
 
@@ -92,12 +93,20 @@ const TicketDetails = ({ ticket }) => {
       )}
 
       <div className="flex space-x-4">
+        {/* Botón de asignar ticket */}
         <button
-          className="bg-blue-500 text-white font-bold py-2 px-4 rounded-lg hover:bg-blue-600 transition"
+          className={`${
+            ticket.assigned_to
+              ? 'bg-gray-400 cursor-not-allowed'
+              : 'bg-blue-500 hover:bg-blue-600'
+          } text-white font-bold py-2 px-4 rounded-lg transition`}
           onClick={handleAssign} // Llama a la función de asignación
+          disabled={!!ticket.assigned_to} // Deshabilita si ya tiene asignado
         >
-          Asignar Ticket
+          {ticket.assigned_to ? 'Ya Asignado' : 'Asignar Ticket'}
         </button>
+
+        {/* Botón de cambiar estado */}
         {!isEditingStatus ? (
           <button
             className="bg-blue-500 text-white font-bold py-2 px-4 rounded-lg hover:bg-blue-600 transition"
@@ -119,5 +128,6 @@ const TicketDetails = ({ ticket }) => {
 };
 
 export default TicketDetails;
+
 
 
