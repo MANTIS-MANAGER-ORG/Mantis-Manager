@@ -63,22 +63,22 @@ const MachineList = () => {
       )}
 
       {/* Tabla de máquinas */}
-      <table className="min-w-full bg-white border border-gray-300">
+      <table className="min-w-full bg-white">
         <thead>
-          <tr className="bg-indigo-600 text-white">
-            <th className="py-3 px-4 text-center">Serial</th>
-            <th className="py-3 px-4 text-center">Modelo</th>
-            <th className="py-3 px-4 text-center">Tipo</th>
-            <th className="py-3 px-4 text-center">Marca</th>
-            <th className="py-3 px-4 text-center">Descripción</th>
-            <th className="py-3 px-4 text-center">Función</th>
-            <th className="py-3 px-4 text-center">Acciones</th>
+          <tr className="bg-slate-50 border-slate-200 ">
+            <th className="py-4 px-6 text-left font-sans text-sm font-normal leading-none text-slate-500">Serial</th>
+            <th className="py-4 px-6 text-left font-sans text-sm font-normal leading-none text-slate-500">Modelo</th>
+            <th className="py-4 px-6 text-left font-sans text-sm font-normal leading-none text-slate-500">Tipo</th>
+            <th className="py-4 px-6 text-left font-sans text-sm font-normal leading-none text-slate-500">Marca</th>
+            <th className="py-4 px-6 text-left font-sans text-sm font-normal leading-none text-slate-500">Descripción</th>
+            <th className="py-4 px-6 text-left font-sans text-sm font-normal leading-none text-slate-500">Función</th>
+            <th className="py-4 px-6 text-left font-sans text-sm font-normal leading-none text-slate-500">Acciones</th>
           </tr>
         </thead>
         <tbody>
           {machines.map((machine, index) => (
             <tr key={index} className="border-b hover:bg-gray-100">
-              <td className="py-3 text-center">
+              <td className="py-4 px-6 text-left border-b boder-slate-200 text-sm font-semibold text-slate-700">
                 {editingMachineId === machine.id ? (
                   <input
                     className='border rounded-md border-red-100 bg-blue-100'
@@ -95,7 +95,7 @@ const MachineList = () => {
                   machine.serial
                 )}
               </td>
-              <td className="py-3 text-center">
+              <td className="py-4 px-6 text-left border-b boder-slate-200 text-sm font-semibold text-slate-700">
                 {editingMachineId === machine.id ? (
                   <input
                     className='border rounded-md border-red-100 bg-blue-100'
@@ -112,7 +112,7 @@ const MachineList = () => {
                   machine.model
                 )}
               </td>
-              <td className="py-3 text-center">
+              <td className="py-4 px-6 text-left border-b boder-slate-200 text-sm font-semibold text-slate-700">
                 {editingMachineId === machine.id ? (
                   <input
                     className='border rounded-md border-red-100 bg-blue-100'
@@ -129,7 +129,7 @@ const MachineList = () => {
                   machine.type
                 )}
               </td>
-              <td className="py-3 text-center">
+              <td className="py-4 px-6 text-left border-b boder-slate-200 text-sm font-semibold text-slate-700">
                 {editingMachineId === machine.id ? (
                   <input
                     className='border rounded-md border-red-100 bg-blue-100'
@@ -146,7 +146,7 @@ const MachineList = () => {
                   machine.brand || 'N/A'
                 )}
               </td>
-              <td className="py-3 text-center">
+              <td className="py-4 px-6 text-left border-b boder-slate-200 text-sm font-semibold text-slate-700">
                 {editingMachineId === machine.id ? (
                   <input
                     className='border rounded-md border-red-100 bg-blue-100'
@@ -162,7 +162,7 @@ const MachineList = () => {
                   machine.description || 'N/A'
                 )}
               </td>
-              <td className="py-3 text-center">
+              <td className="py-4 px-6 text-left border-b boder-slate-200 text-sm font-semibold text-slate-700">
                 {editingMachineId === machine.id ? (
                   <input
                     className='border rounded-md border-red-100 bg-blue-100'
@@ -210,6 +210,7 @@ const MachineList = () => {
       {isModalOpen && selectedMachine && (
         <MachineDetailsModal machine={selectedMachine} closeModal={closeDetailsModal} />
       )}
+      <div className='w-full flex justify-end'>
 
       <button
         onClick={() => setIsAddMachineModalOpen(true)}
@@ -217,6 +218,7 @@ const MachineList = () => {
       >
         Agregar Máquina
       </button>
+      </div>
     </div>
   );
 };

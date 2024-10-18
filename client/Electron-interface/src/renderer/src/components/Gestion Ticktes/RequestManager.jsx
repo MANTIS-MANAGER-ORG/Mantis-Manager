@@ -17,7 +17,7 @@ const RequestsManager = () => {
     
      
 
-      <div className='flex '>
+      <div className='flex  items-center '>
         
           <RequestList onSelectRequest={handleSelectRequest} />
         

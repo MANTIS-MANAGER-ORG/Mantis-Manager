@@ -26,7 +26,7 @@ const RequestList = ({ onSelectRequest }) => {
   }, []);
 
   if (loading) {
-    return <CircularProgress />;
+    return <CircularProgress />;// porbrar circulo de carga 
   }
 
   if (error) {
@@ -49,19 +49,19 @@ const RequestList = ({ onSelectRequest }) => {
   };
 
   return (
-    <div className='flex-col'>
-      <h2 className='text-red-300'>Request List</h2>
-      <table>
+    <div className='flex-col justify-center'>
+      
+      <table className='justify-center'>
         <thead>
-          <tr>
-            <th className="py-4 px-6 text-left">ID</th>
-            <th className='py-4 px-6 text-left'>Description</th>
-            <th className='py-4 px-6 text-left'>Status</th>
-            <th className='py-4 px-6 text-left'>Type</th>
-            <th className='py-4 px-6 text-left'>Ticket ID</th>
-            <th className='py-4 px-6 text-left'>Fecha</th>
-            <th className='py-4 px-6 text-left'>Detalles</th>
-            <th className='py-4 px-6 text-left'>Acciones</th>
+          <tr className=' bg-slate-50 border-slate-200'>
+            <th className="py-4 px-6 text-left font-sans text-sm font-normal leading-none text-slate-500">ID</th>
+            <th className="py-4 px-6 text-left font-sans text-sm font-normal leading-none text-slate-500">Description</th>
+            <th className="py-4 px-6 text-left font-sans text-sm font-normal leading-none text-slate-500">Status</th>
+            <th className="py-4 px-6 text-left font-sans text-sm font-normal leading-none text-slate-500">Type</th>
+            <th className="py-4 px-6 text-left font-sans text-sm font-normal leading-none text-slate-500">Ticket ID</th>
+            <th className="py-4 px-6 text-left font-sans text-sm font-normal leading-none text-slate-500">Fecha</th>
+            <th className="py-4 px-6 text-left font-sans text-sm font-normal leading-none text-slate-500">Detalles</th>
+            <th className="py-4 px-6 text-left font-sans text-sm font-normal leading-none text-slate-500">Acciones</th>
           </tr>
         </thead>
         <tbody>
@@ -69,16 +69,17 @@ const RequestList = ({ onSelectRequest }) => {
             .filter(request => request.status === 'pendiente')
             .map((request) => (
               <tr key={request.id}>
-                <td className="py-4 px-6 text-left">{request.id}</td>
-                <td className="py-4 px-6 text-left">{request.description}</td>
-                <td className="py-4 px-6 text-left">{request.status}</td>
-                <td className="py-4 px-6 text-left">{request.type}</td>
-                <td className="py-4 px-6 text-left">{request.ticket_id}</td>
-                <td className="py-4 px-6 text-left">{request.created_at}</td>
-                <td>
-                  <button onClick={() => onSelectRequest(request)}>Ver detalles</button>
+                <td className="py-4 px-6 text-left border-b boder-slate-200 text-sm font-semibold text-slate-700">{request.id}</td>
+                <td className="py-4 px-6 text-left border-b boder-slate-200 text-sm font-semibold text-slate-700">{request.description}</td>
+                <td className="py-4 px-6 text-left border-b boder-slate-200 text-sm font-semibold text-slate-700">{request.status}</td>
+                <td className="py-4 px-6 text-left border-b boder-slate-200 text-sm font-semibold text-slate-700">{request.type}</td>
+                <td className="py-4 px-6 text-left border-b boder-slate-200 text-sm font-semibold text-slate-700">{request.ticket_id}</td>
+                <td className="py-4 px-6 text-left border-b boder-slate-200 text-sm font-semibold text-slate-700">{request.created_at}</td>
+                <td className='py-4 px-6 text-left border-b boder-slate-200 text-sm font-semibold text-slate-700'>
+                  <button 
+                   onClick={() => onSelectRequest(request)}>Ver detalles</button> {/* creo que esto se va a borrar  */ }
                 </td>
-                <td className="py-4 px-6 text-left">
+                <td className='py-4 px-6 text-left border-b boder-slate-200 '>
                   <button
                     className="text-green-500 mr-2"
                     onClick={() => handleResponse(request.id, 'aceptada')}

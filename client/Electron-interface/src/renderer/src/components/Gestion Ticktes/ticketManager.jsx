@@ -64,8 +64,8 @@ const TicketsManager = () => {
       )}
 
       {activeSession === 'requests' && (
-        <div className="bg-white p-6 rounded-lg shadow-lg transition-transform transform hover:scale-105 duration-300 mt-4">
-          <h2 className="text-2xl font-semibold mb-4 text-blue-600">Gestión de Solicitudes</h2>
+        <div className="bg-white rounded-lg mt-4 mx-auto w-3/4 p-6">
+          <h2 className="text-2xl font-semibold mb-4  text-black text-center">Gestión de Solicitudes</h2>
           <RequestsManager />
         </div>
       )}
