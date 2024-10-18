@@ -4,45 +4,35 @@ import { HiCheck, HiX } from 'react-icons/hi';
 import { useTicketContext } from '../context/ticketContext';
 
 const RequestList = ({ onSelectRequest }) => {
-  const { getRequest,respondeRequest } = useTicketContext(); 
+  const { getRequest, respondeRequest } = useTicketContext(); 
   const [requests, setRequests] = useState([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // Simula la carga de solicitudes
-    setLoading(true); // Asegúrate de establecer loading a true antes de la carga
     const fetchRequests = async () => {
-      setTimeout(async () => {
-        const datos = await getRequest();
-        console.log(datos);
-        setRequests(datos); // Asegúrate de guardar los datos recibidos
-        setLoading(false);
-      }, 1000);
+      setLoading(true);
+      const datos = await getRequest();
+      console.log(datos);
+      setRequests(datos);
+      setLoading(false);
     };
-  
-    fetchRequests(); // Llama a la función de carga
-  }, []); // Las dependencias se pueden ajustar según lo necesites
-  
+    fetchRequests(); 
+  }, []);
+
   if (loading) {
     return <CircularProgress />;
   }
 
-  const accept = async (id)=>{
-    const data = await respondeRequest(id, 'aceptada')
-    console.log(data)
-   
-
-
-  }
-  const decline =  async (id)=>{
-    const data = await respondeRequest(id, 'rechazada')
-    console.log(data)
-
-
-  }
-
-
-
+  const handleResponse = async (id, action) => {
+    try {
+      const data = await respondeRequest(id, action);
+      console.log(data);
+      // Actualiza el estado eliminando la solicitud aceptada o rechazada
+      setRequests((prevRequests) => prevRequests.filter(request => request.id !== id));
+    } catch (error) {
+      console.error("Error responding to request:", error);
+    }
+  };
 
   return (
     <div className='flex-col'>
@@ -61,33 +51,35 @@ const RequestList = ({ onSelectRequest }) => {
           </tr>
         </thead>
         <tbody>
-          {requests.map((request) => (
-            <tr key={request.id}>
-              <td className="py-4 px-6 text-left">{request.id}</td>
-              <td className="py-4 px-6 text-left">{request.description}</td>
-              <td className="py-4 px-6 text-left">{request.status}</td>
-              <td className="py-4 px-6 text-left">{request.type}</td>
-              <td className="py-4 px-6 text-left">{request.ticket_id}</td>
-              <td className="py-4 px-6 text-left">{request.created_at}</td>
-              <td>
-                <button onClick={() => onSelectRequest(request)}>Ver detalles</button>
-              </td>
-              <td className="py-4 px-6 text-left">
-                <button
-                  className="text-green-500 mr-2"
-                  onClick={() => accept(request.id)}
-                >
-                  <HiCheck size={20} />
-                </button>
-                <button
-                  className="text-red-500"
-                  onClick={() => decline(request.id)}
-                >
-                  <HiX size={20} />
-                </button>
-              </td>
-            </tr>
-          ))}
+          {requests
+            .filter(request => request.status === 'pendiente')
+            .map((request) => (
+              <tr key={request.id}>
+                <td className="py-4 px-6 text-left">{request.id}</td>
+                <td className="py-4 px-6 text-left">{request.description}</td>
+                <td className="py-4 px-6 text-left">{request.status}</td>
+                <td className="py-4 px-6 text-left">{request.type}</td>
+                <td className="py-4 px-6 text-left">{request.ticket_id}</td>
+                <td className="py-4 px-6 text-left">{request.created_at}</td>
+                <td>
+                  <button onClick={() => onSelectRequest(request)}>Ver detalles</button>
+                </td>
+                <td className="py-4 px-6 text-left">
+                  <button
+                    className="text-green-500 mr-2"
+                    onClick={() => handleResponse(request.id, 'aceptada')}
+                  >
+                    <HiCheck size={20} />
+                  </button>
+                  <button
+                    className="text-red-500"
+                    onClick={() => handleResponse(request.id, 'rechazada')}
+                  >
+                    <HiX size={20} />
+                  </button>
+                </td>
+              </tr>
+            ))}
         </tbody>
       </table>
     </div>

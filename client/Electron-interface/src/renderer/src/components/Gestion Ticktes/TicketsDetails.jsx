@@ -1,20 +1,28 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useTicketContext } from '../context/ticketContext'; // Importa el contexto
 
-const TicketDetails = ({ ticket }) => {
+const TicketDetails = ({ ticket, handleClose }) => {
   const { AsignedTicket, changeTicketState, createRequest } = useTicketContext(); // Usa createRequest
   const [assignedTo, setAssignedTo] = useState(''); // Estado para almacenar el ID del usuario asignado
   const [newStatus, setNewStatus] = useState(ticket.state); // Estado para cambiar el estado del ticket
   const [isEditingStatus, setIsEditingStatus] = useState(false); // Estado para controlar la edición del estado
   const [message, setMessage] = useState(''); // Estado para mostrar mensajes
+  const [ticketDetails, setTicketDetails] = useState(ticket); // Estado para mostrar los detalles del ticket
+
+  // Sincroniza el estado local cuando se recibe un nuevo ticket
+  useEffect(() => {
+    setTicketDetails(ticket);
+    setNewStatus(ticket.state); // Actualiza el nuevo estado también
+  }, [ticket]);
 
   // Maneja la asignación del ticket
   const handleAssign = async () => {
     if (assignedTo) {
       try {
-        console.log(ticket.id, assignedTo);
         await AsignedTicket(String(ticket.id), assignedTo); // Usa la función del contexto
         setMessage(`Ticket asignado al usuario con ID: ${assignedTo}`);
+        setTicketDetails((prevDetails) => ({ ...prevDetails, assigned_to: assignedTo })); // Actualiza el estado local
+        handleClose(); // Cierra el modal después de la asignación
       } catch (error) {
         setMessage('Error al asignar el ticket');
       }
@@ -29,6 +37,8 @@ const TicketDetails = ({ ticket }) => {
       await changeTicketState(ticket.id, newStatus); // Usa la función del contexto
       setMessage(`Estado del ticket actualizado a: ${newStatus}`);
       setIsEditingStatus(false); // Oculta el campo de edición del estado
+      setTicketDetails((prevDetails) => ({ ...prevDetails, state: newStatus })); // Actualiza el estado local
+      handleClose(); // Cierra el modal después de guardar el estado
     } catch (error) {
       setMessage('Error al actualizar el estado del ticket');
     }
@@ -39,6 +49,7 @@ const TicketDetails = ({ ticket }) => {
     try {
       await createRequest(ticket.id, 'close', 'cierre'); // Usa createRequest para solicitar el cierre
       setMessage('Solicitud de cierre enviada');
+      handleClose(); // Cierra el modal después de solicitar el cierre
     } catch (error) {
       setMessage('Error al solicitar el cierre del ticket');
     }
@@ -49,6 +60,7 @@ const TicketDetails = ({ ticket }) => {
     try {
       await createRequest(ticket.id, 'reopen'); // Usa createRequest para solicitar la reapertura
       setMessage('Solicitud de reapertura enviada');
+      handleClose(); // Cierra el modal después de solicitar la reapertura
     } catch (error) {
       setMessage('Error al solicitar la reapertura del ticket');
     }
@@ -59,24 +71,24 @@ const TicketDetails = ({ ticket }) => {
       <h2 className="text-2xl font-bold mb-6">Detalles del Ticket</h2>
       <div className="mb-4">
         <p className="mb-2">
-          <span className="font-semibold">ID:</span> {ticket.id}
+          <span className="font-semibold">ID:</span> {ticketDetails.id}
         </p>
         <p className="mb-2">
-          <span className="font-semibold">Descripción:</span> {ticket.description}
+          <span className="font-semibold">Descripción:</span> {ticketDetails.description}
         </p>
         <p className="mb-4">
           <span className="font-semibold">Estado:</span>
           {!isEditingStatus ? (
             <span
               className={`font-bold pl-2 ${
-                ticket.state === 'En cola'
+                ticketDetails.state === 'En cola'
                   ? 'text-orange-500'
-                  : ticket.state === 'Closed'
+                  : ticketDetails.state === 'Closed'
                   ? 'text-red-500'
                   : 'text-green-500'
               }`}
             >
-              {ticket.state}
+              {ticketDetails.state}
             </span>
           ) : (
             <select
@@ -101,7 +113,7 @@ const TicketDetails = ({ ticket }) => {
           value={assignedTo}
           onChange={(e) => setAssignedTo(e.target.value)}
           placeholder="Ingrese ID del usuario"
-          disabled={!!ticket.assigned_to} // Deshabilita si ya tiene asignado
+          disabled={!!ticketDetails.assigned_to} // Deshabilita si ya tiene asignado
         />
       </div>
 
@@ -116,12 +128,12 @@ const TicketDetails = ({ ticket }) => {
         {/* Botón de asignar ticket */}
         <button
           className={`${
-            ticket.assigned_to ? 'bg-gray-500 cursor-not-allowed' : 'bg-blue-500'
+            ticketDetails.assigned_to ? 'bg-gray-500 cursor-not-allowed' : 'bg-blue-500'
           } text-white px-4 py-2 rounded-lg shadow-sm`}
           onClick={handleAssign}
-          disabled={!!ticket.assigned_to} // Deshabilita si ya tiene asignado
+          disabled={!!ticketDetails.assigned_to} // Deshabilita si ya tiene asignado
         >
-          {ticket.assigned_to ? 'Ya Asignado' : 'Asignar'}
+          {ticketDetails.assigned_to ? 'Ya Asignado' : 'Asignar'}
         </button>
 
         {/* Botón para editar el estado */}
@@ -148,10 +160,10 @@ const TicketDetails = ({ ticket }) => {
         {/* Botón de Solicitud de Cierre */}
         <button
           className={`${
-            ticket.state !== 'en proceso' ? 'bg-gray-500 cursor-not-allowed' : 'bg-red-500'
+            ticketDetails.state !== 'en proceso' ? 'bg-gray-500 cursor-not-allowed' : 'bg-red-500'
           } text-white px-4 py-2 rounded-lg shadow-sm`}
           onClick={handleCloseRequest}
-          disabled={ticket.state !== 'en proceso'} // Deshabilita si el estado no es "en proceso"
+          disabled={ticketDetails.state !== 'en proceso'} // Deshabilita si el estado no es "en proceso"
         >
           Solicitar Cierre
         </button>
@@ -159,10 +171,10 @@ const TicketDetails = ({ ticket }) => {
         {/* Botón de Solicitud de Reapertura */}
         <button
           className={`${
-            ticket.state !== 'terminado' ? 'bg-gray-500 cursor-not-allowed' : 'bg-green-500'
+            ticketDetails.state !== 'terminado' ? 'bg-gray-500 cursor-not-allowed' : 'bg-green-500'
           } text-white px-4 py-2 rounded-lg shadow-sm`}
           onClick={handleReopenRequest}
-          disabled={ticket.state !== 'terminado'} // Deshabilita si el estado no es "terminado"
+          disabled={ticketDetails.state !== 'terminado'} // Deshabilita si el estado no es "terminado"
         >
           Solicitar Reapertura
         </button>
@@ -172,7 +184,6 @@ const TicketDetails = ({ ticket }) => {
 };
 
 export default TicketDetails;
-
 
 
 

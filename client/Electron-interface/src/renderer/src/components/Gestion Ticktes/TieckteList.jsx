@@ -14,18 +14,18 @@ const TicketList = () => {
     return <div>No hay datos disponibles para la pestaña actual.</div>;
   }
 
-
-  // Estado inicial para las pestañas
+  // Maneja la selección del ticket
   const handleSelectTicket = (ticket) => {
     setSelectedTicket(ticket);
     setOpenModal(true);
   };
 
-  console.log (Object.keys(ticketsData));
   const handleCloseModal = () => {
+    console.log('cerrando modal')
     setOpenModal(false);
   };
 
+  // Muestra un loader si está cargando
   if (loading) {
     return (
       <div className="flex justify-center items-center min-h-[200px]">
@@ -37,16 +37,13 @@ const TicketList = () => {
   return (
     <div className="flex flex-col items-center min-h-screen ">
       <div className="bg-white p-8 rounded-lg w-full">
-        <h1 className="text-3xl font-bold text-center mb-8">Tickets List</h1>
-        {/* Tabs for ticket states */}
+        <h1 className="text-3xl font-bold text-center mb-8">Lista de Tickets</h1>
+        {/* Pestañas para los estados de los tickets */}
         <div className="flex justify-around mb-4">
           {Object.keys(ticketsData).map((tab) => (
-            
             <button
               key={tab}
-              className={`px-4 py-2 ${
-                currentTab === tab ? 'bg-blue-500 text-white' : 'text-blue-500'
-              }`}
+              className={`px-4 py-2 ${currentTab === tab ? 'bg-blue-500 text-white' : 'text-blue-500'}`}
               onClick={() => setCurrentTab(tab)}
             >
               {tab}
@@ -58,10 +55,9 @@ const TicketList = () => {
             <thead>
               <tr className="bg-gray-100">
                 <th className="py-4 px-6 text-left">ID</th>
-                <th className="py-4 px-6 text-left">Description</th>
+                <th className="py-4 px-6 text-left">Descripción</th>
                 <th className="py-4 px-6 text-left">Estado</th>
                 <th className="py-4 px-6 text-left">Acciones</th>
-                
                 <th className="py-4 px-6 text-left">Asignado</th>
               </tr>
             </thead>
@@ -70,11 +66,7 @@ const TicketList = () => {
                 <tr key={ticket.id} className="hover:bg-gray-50">
                   <td className="py-4 px-6 text-left">{ticket.id}</td>
                   <td className="py-4 px-6">{ticket.description}</td>
-                  <td
-                    className={`py-4 px-6 text-left ${
-                      ticket.state === 'pendiente' ? 'text-red-500' : 'text-green-500'
-                    }`}
-                  >
+                  <td className={`py-4 px-6 text-left ${ticket.state === 'pendiente' ? 'text-red-500' : 'text-green-500'}`}>
                     {ticket.state}
                   </td>
                   <td className="py-4 px-10 text-left">
@@ -85,8 +77,7 @@ const TicketList = () => {
                       <HiOutlineEye size={24} />
                     </button>
                   </td>
-                  
-                  <td>{ticket?.assigned_to?.id ? ticket.assigned_to.id : 'No asignado'}</td>
+                  <td>{ticket?.assigned_to?.id || 'No asignado'}</td>
                 </tr>
               ))}
             </tbody>
@@ -104,7 +95,7 @@ const TicketList = () => {
             >
               &times;
             </button>
-            {selectedTicket && <TicketDetails ticket={selectedTicket} />} {/* TicketDetails componente */}
+            {selectedTicket && <TicketDetails ticket={selectedTicket} handleClose={handleCloseModal} />} {/* Componente TicketDetails */}
           </div>
         </div>
       )}
