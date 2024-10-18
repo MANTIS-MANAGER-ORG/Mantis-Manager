@@ -7,13 +7,19 @@ const RequestList = ({ onSelectRequest }) => {
   const { getRequest, respondeRequest } = useTicketContext(); 
   const [requests, setRequests] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
   useEffect(() => {
     const fetchRequests = async () => {
       setLoading(true);
-      const datos = await getRequest();
-      console.log(datos);
-      setRequests(datos);
+      setError(null); // Reset any previous errors
+      try {
+        const datos = await getRequest();
+        setRequests(datos);
+      } catch (err) {
+        console.error("Error fetching requests:", err);
+        setError('Failed to load requests. Please try again.');
+      }
       setLoading(false);
     };
     fetchRequests(); 
@@ -21,6 +27,14 @@ const RequestList = ({ onSelectRequest }) => {
 
   if (loading) {
     return <CircularProgress />;
+  }
+
+  if (error) {
+    return <div className="text-red-500">{error}</div>;
+  }
+
+  if (requests.length === 0) {
+    return <div className="text-gray-500">No pending requests available.</div>;
   }
 
   const handleResponse = async (id, action) => {
@@ -87,4 +101,3 @@ const RequestList = ({ onSelectRequest }) => {
 };
 
 export default RequestList;
-

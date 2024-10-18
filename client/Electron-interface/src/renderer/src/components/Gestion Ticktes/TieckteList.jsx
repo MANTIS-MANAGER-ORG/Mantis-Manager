@@ -52,32 +52,34 @@ const TicketList = () => {
         </div>
         <div className="overflow-x-auto">
           <table className="min-w-full border-collapse">
-            <thead>
-              <tr className="bg-gray-100">
-                <th className="py-4 px-6 text-left">ID</th>
-                <th className="py-4 px-6 text-left">Descripción</th>
-                <th className="py-4 px-6 text-left">Estado</th>
-                <th className="py-4 px-6 text-left">Acciones</th>
-                <th className="py-4 px-6 text-left">Asignado</th>
+            <thead >
+              <tr className="bg-slate-50 border-slate-200 ">
+                <th className="py-4 px-6 text-left font-sans text-sm font-normal leading-none text-slate-500">ID</th>
+                <th className="py-4 px-6 text-left font-sans text-sm font-normal leading-none text-slate-500">Descripción</th>
+                <th className="py-4 px-6 text-left font-sans text-sm font-normal leading-none text-slate-500">Estado</th>
+                <th className="py-4 px-6 text-left font-sans text-sm font-normal leading-none text-slate-500">Acciones</th>
+                <th className="py-4 px-6 text-left font-sans text-sm font-normal leading-none text-slate-500">Asignado</th>
               </tr>
             </thead>
             <tbody>
               {ticketsData[currentTab].map((ticket) => (
                 <tr key={ticket.id} className="hover:bg-gray-50">
-                  <td className="py-4 px-6 text-left">{ticket.id}</td>
-                  <td className="py-4 px-6">{ticket.description}</td>
-                  <td className={`py-4 px-6 text-left ${ticket.state === 'pendiente' ? 'text-red-500' : 'text-green-500'}`}>
+                  <td className="py-4 px-6 text-left border-b boder-slate-200 text-sm font-semibold text-slate-700">{ticket.id}</td>
+                  <td className="py-4 px-6 text-left border-b boder-slate-200 text-sm font-semibold text-slate-700">{ticket.description}</td>
+                  <td className='border-b'>
+                    <span  className={`py-1 px-1 text-left h-10 w-10 rounded-md font-sans text-xs font-medium uppercase text-slate-900 ${ticket.state === 'pendiente' ? 'text-red-500 bg-red-200' : 'text-green-800 bg-green-200'}`}>
                     {ticket.state}
+                    </span>
                   </td>
-                  <td className="py-4 px-10 text-left">
+                  <td className="py-4 px-10 text-left border-b">
                     <button
                       onClick={() => handleSelectTicket(ticket)}
                       className="text-blue-500 hover:text-blue-700 transition-all"
                     >
                       <HiOutlineEye size={24} />
                     </button>
-                  </td>
-                  <td>{ticket?.assigned_to?.id || 'No asignado'}</td>
+                  </td >
+                  <td className='"py-4 px-6 text-left border-b boder-slate-200 text-sm font-semibold text-slate-700"'>{ticket?.assigned_to?.id || 'No asignado'}</td>
                 </tr>
               ))}
             </tbody>

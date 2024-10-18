@@ -45,7 +45,7 @@ const TicketCard = ({ ticket, onCancel, onEdit, tab }) => {
   };
 
   return (
-    <div className={`ticket-card border-4 rounded-lg shadow-lg p-6 mb-4 transition-transform transform hover:scale-105`}
+    <div className={`ticket-card  rounded-lg shadow-lg p-6 mb-4 transition-transform transform hover:scale-105`}
          style={{ borderColor: ticket.color }}>
       <h3 className="text-2xl font-bold text-gray-700 mb-4">Ticket {ticket.id}</h3>
       
@@ -134,7 +134,7 @@ const TicketCard = ({ ticket, onCancel, onEdit, tab }) => {
               Cancelar solicitud
             </button>
             <button
-              className="bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              class="inline-flex items-center px-4 py-2 text-sm font-medium text-center text-white bg-blue-700 rounded-lg hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
               onClick={() => setIsEditing(true)}
             >
               Editar
