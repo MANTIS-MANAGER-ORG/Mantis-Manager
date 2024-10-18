@@ -70,7 +70,8 @@ async def websocket_endpoint(websocket: WebSocket, user_id: str):
                                     "type":"error",
                                     "timestamp": datetime.now().isoformat()
                                 },
-                                user_id
+                                user_id,
+                                True
                             )
                     except Exception as e:
                         logger.error(f"Error al autenticar usuario {user_id}: {e}")
@@ -80,7 +81,8 @@ async def websocket_endpoint(websocket: WebSocket, user_id: str):
                                 "type":"error",
                                 "timestamp": datetime.now().isoformat()
                             },
-                            user_id
+                            user_id,
+                            True
                         )
             else:
                 # Enviar la respuesta normalmente

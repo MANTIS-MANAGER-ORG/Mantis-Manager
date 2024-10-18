@@ -98,7 +98,7 @@ class ConnectionManager:
         else:
             logger.warning(f"Intento de autenticación fallido: Usuario {user_id} no conectado.")
 
-    async def send_personal_message(self, message: str | dict, user_id: str):
+    async def send_personal_message(self, message: str | dict, user_id: str, obligate : bool = False):
         if isinstance(message, dict):
             message = json.dumps(message)
 
@@ -106,7 +106,7 @@ class ConnectionManager:
             websocket, is_authenticated = self.active_connections[user_id]
 
             # Verificar si el usuario está autenticado antes de enviar mensajes
-            if not is_authenticated:
+            if not is_authenticated and not obligate:
                 logger.warning(f"Usuario {user_id} no está autenticado. No se puede enviar el mensaje.")
                 NotificationManager.add_notification(user_id, message)
                 return
@@ -119,8 +119,9 @@ class ConnectionManager:
                 NotificationManager.add_notification(user_id, message)
                 logger.info(f"Mensaje almacenado para usuario {user_id} debido a error al enviar.")
         else:
-            NotificationManager.add_notification(user_id, message)
-            logger.info(f"Mensaje almacenado para usuario {user_id}: {message}")
+            if not obligate:
+                NotificationManager.add_notification(user_id, message)
+                logger.info(f"Mensaje almacenado para usuario {user_id}: {message}")
 
     async def send_pending_messages(self, user_id: str):
         
