@@ -38,9 +38,11 @@ const Sidebar = ({ activeTab }) => {
           {/* Ícono para la pestaña 'tickets' */}
           {activeTab === 'tickets' && (
             <div>
-              <li className={`flex items-center justify-center w-10 h-10 rounded-full ${activeTab === 'tickets' ? 'bg-gray-800 text-yellow-400' : 'bg-gray-700 text-gray-400'} hover:bg-gray-600`}>
+              <div className=' m-auto flex'>
+              <li className={`flex items-center justify-center w-20 h-10 rounded-full ${activeTab === 'tickets' ? 'bg-gray-800 text-yellow-400' : 'bg-gray-700 text-gray-400'} hover:bg-gray-600`}>
                 <span className="text-lg font-semibold">T</span>
               </li>
+              </div>
               {/* Componente adicional para 'tickets' */}
               <SidebarTickets className="mt-8" />
             </div>

@@ -1,151 +1,73 @@
 import React, { useState } from "react";
-import './Tickets.css'; // Asegúrate de que aquí solo se mantengan los estilos que Tailwind no cubre.
+import TicketDetails from "./detailTickets"; // Importamos el nuevo componente
 
-/**
- * Componente TicketCard que muestra y gestiona tickets individuales.
- *
- * @param {Object} props - Las propiedades para el componente.
- * @param {Object} props.ticket - El objeto de datos del ticket.
- * @param {Function} props.onCancel - Función para manejar la cancelación del ticket.
- * @param {Function} props.onEdit - Función para manejar la edición del ticket.
- * @param {string} props.tab - La pestaña o sección actual donde se muestra el ticket.
- *
- * @returns {JSX.Element} El componente TicketCard renderizado.
- */
 const TicketCard = ({ ticket, onCancel, onEdit, tab }) => {
-  console.log(ticket);
-  // Estado para gestionar si el ticket está en modo edición
-  const [isEditing, setIsEditing] = useState(false);
+  const [showDetails, setShowDetails] = useState(false);
 
-  // Estado para gestionar los datos del ticket mientras se edita
-  const [editedTicket, setEditedTicket] = useState(ticket);
-
-  /**
-   * Maneja los cambios en los campos de entrada durante la edición del ticket.
-   * 
-   * @param {Object} e - El objeto del evento.
-   */
-  const handleEditChange = (e) => {
-    const { name, value } = e.target;
-    setEditedTicket({
-      ...editedTicket,
-      [name]: value
-    });
+  // Función para determinar el estilo según la prioridad
+  const getPriorityStyle = (priority) => {
+    switch (priority) {
+      case "alta":
+        return { backgroundColor: "bg-red-200", textColor: "text-gray-800" }; // Fondo rojo claro y texto oscuro
+      case "media":
+        return { backgroundColor: "bg-yellow-200", textColor: "text-gray-800" }; // Fondo amarillo claro y texto oscuro
+      case "baja":
+        return { backgroundColor: "bg-blue-200", textColor: "text-gray-800" }; // Fondo azul claro y texto oscuro
+      default:
+        return { backgroundColor: "bg-gray-200", textColor: "text-gray-800" }; // Color por defecto
+    }
   };
 
-  /**
-   * Maneja el envío del formulario de edición del ticket.
-   * 
-   * @param {Object} e - El objeto del evento.
-   */
-  const handleEditSubmit = (e) => {
-    e.preventDefault();
-    onEdit(editedTicket); // Llama a la función onEdit con los datos actualizados del ticket
-    setIsEditing(false);  // Sale del modo de edición
-  };
+  const priorityStyle = getPriorityStyle(ticket.priority);
 
   return (
-    <div className={`ticket-card  rounded-lg shadow-lg p-6 mb-4 transition-transform transform hover:scale-105`}
-         style={{ borderColor: ticket.color }}>
-      <h3 className="text-2xl font-bold text-gray-700 mb-4">Ticket {ticket.id}</h3>
-      
-      {isEditing ? (
-        <form onSubmit={handleEditSubmit} className="space-y-4">
-          <div>
-            <label className="block text-sm font-medium text-gray-700">
-              Descripción:
-              <input
-                type="text"
-                name="description"
-                value={editedTicket.description}
-                onChange={handleEditChange}
-                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
-              />
-            </label>
-          </div>
-          <div>
-            <label className="block text-sm font-medium text-gray-700">
-              Persona que hace la petición:
-              <input
-                type="text"
-                name="person"
-                value={editedTicket.created_by.id}
-                onChange={handleEditChange}
-                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
-              />
-            </label>
-          </div>
-          <div>
-            <label className="block text-sm font-medium text-gray-700">
-              Prioridad:
-              <select
-                name="priority"
-                value={editedTicket.priority}
-                onChange={handleEditChange}
-                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
-              >
-                <option value="alta">Alta</option>
-                <option value="media">Media</option>
-                <option value="baja">Baja</option>
-                <option value="N/A">N/A</option>
-              </select>
-            </label>
-          </div>
-          <div>
-            <label className="block text-sm font-medium text-gray-700">
-              Máquina:
-              <input
-                type="text"
-                name="machine"
-                value={editedTicket.machine_id}
-                onChange={handleEditChange}
-                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
-              />
-            </label>
-          </div>
-          <div className="flex space-x-2">
-            <button
-              type="submit"
-              className="bg-green-500 text-white px-4 py-2 rounded-md hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-green-500"
-            >
-              Guardar cambios
-            </button>
-            <button
-              type="button"
-              onClick={() => setIsEditing(false)}
-              className="bg-gray-500 text-white px-4 py-2 rounded-md hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-gray-500"
-            >
-              Cancelar edición
-            </button>
-          </div>
-        </form>
-      ) : (
-        <>
-          <p className="text-gray-600"><strong>Descripción:</strong> {ticket.description}</p>
-          <p className="text-gray-600"><strong>Persona que hace la petición:</strong> {ticket.created_by.id}</p>
-          <p className="text-gray-600"><strong>Prioridad:</strong> {ticket.priority}</p>
-          <p className="text-gray-600"><strong>Máquina:</strong> {ticket.machine_id}</p>
-          <div className="h-2 w-full rounded mt-4" style={{ backgroundColor: ticket.color }}></div>
-          <div className="flex space-x-2 mt-4">
-            <button
-              className="bg-red-500 text-white px-4 py-2 rounded-md hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-red-500"
-              onClick={() => onCancel(ticket.id, tab)}
-            >
-              Cancelar solicitud
-            </button>
-            <button
-              class="inline-flex items-center px-4 py-2 text-sm font-medium text-center text-white bg-blue-700 rounded-lg hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
-              onClick={() => setIsEditing(true)}
-            >
-              Editar
-            </button>
-          </div>
-        </>
+    <div
+      className={`ticket-card bg-white rounded-lg shadow-lg p-6 mb-4 hover:shadow-xl transition-all border-l-4 h-24 max-w-md`}
+      style={{ borderColor: ticket.color }} // Mantiene el color original de la tarjeta
+    >
+      <div className="flex justify-between items-center">
+        <h3 className="text-lg font-bold text-gray-700 mb-2">Ticket #{ticket.id}</h3>
+        <button
+          onClick={() => setShowDetails(true)}
+          className="text-sm text-blue-600 hover:underline"
+        >
+          Ver detalles
+        </button>
+      </div>
+
+      <div className="flex items-center justify-between mb-4">
+        <div className="flex items-center space-x-4">
+          <div className="h-4 w-4 rounded-full" style={{ backgroundColor: ticket.color }}></div>
+          <span className="text-sm text-gray-500">Prioridad:</span>
+          <span className={`text-sm ${priorityStyle.backgroundColor} ${priorityStyle.textColor} px-1 py-0.5 rounded`}>
+            {ticket.priority} {/* Estilo aplicado solo a la prioridad */}
+          </span>
+        </div>
+        <div className="flex space-x-1"> {/* Espaciado reducido entre los botones */}
+          <button
+            className="bg-red-500 text-white text-xs px-2 py-1 rounded-md hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-red-500"
+            onClick={() => onCancel(ticket.id, tab)}
+          >
+            Cancelar
+          </button>
+          <button
+            className="bg-blue-500 text-white text-xs px-2 py-1 rounded-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500"
+          >
+            Editar
+          </button>
+        </div>
+      </div>
+
+      {/* Mostrar los detalles cuando se haga clic */}
+      {showDetails && (
+        <TicketDetails
+          ticket={ticket}
+          onClose={() => setShowDetails(false)}
+        />
       )}
     </div>
   );
 };
 
 export default TicketCard;
-
 

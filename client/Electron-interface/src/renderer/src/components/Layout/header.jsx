@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
-import { HiCog, HiBell, HiSearch } from 'react-icons/hi';
+import { HiCog, HiBell, HiSearch, HiMoon, HiSun } from 'react-icons/hi';
 import { useAuth } from '../context/authContext'; // Asegúrate de que la ruta sea correcta
+import { useTheme } from '../context/ThemeContext'; // Importa useTheme
 import Ajustes from '../settings/ajustes';
 import TicketNotifications from '../Notificación/notificacion';
 
@@ -8,6 +9,7 @@ const Header = ({ onTabChange }) => {
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   const [isNotificationsOpen, setIsNotificationsOpen] = useState(false);
   const { userRole } = useAuth(); // Obtener el rol del usuario desde el contexto
+  const { darkMode, toggleDarkMode } = useTheme(); // Obtén el estado y función del contexto
 
   const toggleSettings = () => {
     setIsSettingsOpen(!isSettingsOpen);
@@ -42,40 +44,35 @@ const Header = ({ onTabChange }) => {
           <button onClick={() => onTabChange('tickets')} className="text-gray-300 hover:text-white transition duration-300">
             Tickets
           </button>
-          {/* Mostrar opción solo si el usuario es "jefe de desarrollo" */}
           {userRole === 1 && (
             <button onClick={() => onTabChange('desarrollo')} className="text-gray-300 hover:text-white transition duration-300">
               Desarrollo
             </button>
           )}
-          {/* Mostrar opción solo si el usuario es "jefe de mantenimiento" */}
           {userRole === 4 && (
-
             <button onClick={() => onTabChange('mantenimiento')} className="text-gray-300 hover:text-white transition duration-300">
               Mantenimiento
             </button>
-            
-
           )}
-          {(userRole === 4 || userRole === 2)&& (
+          {(userRole === 4 || userRole === 2) && (
             <button onClick={() => onTabChange('Gestion ticktes')} className="text-gray-300 hover:text-white transition duration-300">
               Gestión Ticktes
             </button>
           )}
-
-          
         </div>
 
         <div className="flex items-center space-x-4">
           <div className="flex space-x-3">
-            <button className="p-2 bg-gray-700 rounded-full hover:bg-gray-600 transition duration-300">
-              <HiSearch className="text-white" size={20} />
-            </button>
             <button onClick={toggleNotifications} className="p-2 bg-gray-700 rounded-full hover:bg-gray-600 transition duration-300">
               <HiBell className="text-white" size={20} />
             </button>
             <button onClick={toggleSettings} className="p-2 bg-gray-700 rounded-full hover:bg-gray-600 transition duration-300">
               <HiCog className="text-white" size={20} />
+            </button>
+
+            {/* Botón para alternar modo oscuro */}
+            <button onClick={toggleDarkMode} className="p-2 bg-gray-700 rounded-full hover:bg-gray-600 transition duration-300">
+              {darkMode ? <HiSun className="text-yellow-400" size={20} /> : <HiMoon className="text-white" size={20} />}
             </button>
           </div>
 
@@ -97,10 +94,3 @@ const Header = ({ onTabChange }) => {
 };
 
 export default Header;
-
-
-
-
-
-
-

@@ -65,7 +65,7 @@ const SidebarTickets = () => {
             <path d="M12 3v9.25l5.47 2.94.96-1.72-4.47-2.43V3H12zm-1 12H5V6h6v6h2V6h6v9.25l-5.47-2.94-.96 1.72 4.47 2.43V15z"/>
           </svg>
         </div>
-        <span className="text-white text-sm font-semibold">🗂️</span>
+        
       </div>
 
       {/* Mostrar componente GenerarTickets si isOpen es verdadero */}

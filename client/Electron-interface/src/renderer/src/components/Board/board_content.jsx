@@ -58,7 +58,7 @@ const BoardContent = () => {
   return (
     <div className="main-content  min-h-screen p-6 bg-">
       <div className="max-w-7xl mx-auto bg-white rounded-lg  p-6">
-        <h1 className="text-4xl font-bold text-gray-800 mb-6">Mantis Manager</h1>
+        <h1 className="text-4xl font-bold text-gray-800  darkMode:text-white mb-6">Mantis Manager</h1>
         <p className="text-lg text-gray-600 mb-8">
           Mantis Manager es un software de gestión de mantenimiento diseñado para mejorar la organización y eficiencia en la gestión de mantenimientos y reparaciones de máquinas en una empresa.
         </p>
