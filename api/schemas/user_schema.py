@@ -54,4 +54,4 @@ class LoginResponse(BaseModel):
     
 class ImageResponse(BaseModel):
     """Esquema para la respuesta de subir imagen."""
-    message: str
+    path: str

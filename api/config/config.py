@@ -28,6 +28,14 @@ if environment == 'development':
         if not secret_key:
             raise ValueError("problema con el JWT.")
         return secret_key
+    
+    def get_cloudinary_info() -> dict:
+        cloudinary_info = {
+            'cloud_name': os.getenv('CLOUDINARY_CLOUD_NAME'),
+            'api_key': os.getenv('CLOUDINARY_API_KEY'),
+            'api_secret': os.getenv('CLOUDINARY_API_SECRET')
+        }
+        return cloudinary_info
 else:
     def get_database_url() -> str:
         # Obtiene la URL de la base de datos
@@ -42,3 +50,11 @@ else:
         if not secret_key:
             raise ValueError("problema con el JWT.")
         return secret_key
+    
+    def get_cloudinary_info() -> dict:
+        cloudinary_info = {
+            'cloud_name': os.getenv('CLOUDINARY_CLOUD_NAME'),
+            'api_key': os.getenv('CLOUDINARY_API_KEY'),
+            'api_secret': os.getenv('CLOUDINARY_API_SECRET')
+        }
+        return cloudinary_info
