@@ -8,13 +8,13 @@ const TicketCard = ({ ticket, onCancel, onEdit, tab }) => {
   const getPriorityStyle = (priority) => {
     switch (priority) {
       case "alta":
-        return { backgroundColor: "bg-red-200", textColor: "text-gray-800" }; // Fondo rojo claro y texto oscuro
+        return { backgroundColor: "bg-red-200" }; // Fondo rojo claro y texto oscuro
       case "media":
-        return { backgroundColor: "bg-yellow-200", textColor: "text-gray-800" }; // Fondo amarillo claro y texto oscuro
+        return { backgroundColor: "bg-yellow-200" }; // Fondo amarillo claro y texto oscuro
       case "baja":
-        return { backgroundColor: "bg-blue-200", textColor: "text-gray-800" }; // Fondo azul claro y texto oscuro
+        return { backgroundColor: "bg-blue-200" }; // Fondo azul claro y texto oscuro
       default:
-        return { backgroundColor: "bg-gray-200", textColor: "text-gray-800" }; // Color por defecto
+        return { backgroundColor: "bg-gray-200" }; // Color por defecto
     }
   };
 
@@ -39,7 +39,7 @@ const TicketCard = ({ ticket, onCancel, onEdit, tab }) => {
         <div className="flex items-center space-x-4">
           <div className="h-4 w-4 rounded-full" style={{ backgroundColor: ticket.color }}></div>
           <span className="text-sm text-gray-500">Prioridad:</span>
-          <span className={`text-sm ${priorityStyle.backgroundColor} ${priorityStyle.textColor} px-1 py-0.5 rounded`}>
+          <span className={`text-sm ${priorityStyle.backgroundColor}  font-sans text-xs font-medium uppercase py-1 px-3 text-left   text-slate-900  rounded-md `}>
             {ticket.priority} {/* Estilo aplicado solo a la prioridad */}
           </span>
         </div>
