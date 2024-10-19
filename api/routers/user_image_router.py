@@ -124,7 +124,7 @@ async def get_user_image(
         resource_type="image",
         sign_url=True,
         secure=True,
-        expires_at=int(time.time() + 60) 
+        expires_at=int(time.time() + 15 * 60) 
     )
 
     return ImageResponse(path=signed_url)
