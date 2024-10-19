@@ -74,9 +74,22 @@ async def upload_user_image(
     user.image_field = f"{result['display_name']}.{result['format']}"
     db.commit()
     db.refresh(user)
+    
+    # Generar la URL firmada con una expiración de 5 minutos
+    signed_url, options = cloudinary_url(
+        user.image_field,  
+        resource_type="image",
+        sign_url=True,
+        secure=True,
+        expires_at=int(time.time() + 60) 
+    )
 
     # Retornar la URL segura de la imagen
-    return ImageResponse(path=user.image_field)
+    return ImageResponse(
+        message="Imagen subida correctamente",
+        image_name=user.image_field,
+        path=signed_url
+    )
 
 
 @user_image_router.get(

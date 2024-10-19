@@ -54,4 +54,6 @@ class LoginResponse(BaseModel):
     
 class ImageResponse(BaseModel):
     """Esquema para la respuesta de subir imagen."""
-    path: str
+    message: Optional[str] = Field(None, description="Mensaje de éxito.")
+    image_name : Optional[str] = Field(None, description="Nombre de la imagen subida.")
+    path: Optional[str] = Field(None, description="URL de la imagen subida.")
