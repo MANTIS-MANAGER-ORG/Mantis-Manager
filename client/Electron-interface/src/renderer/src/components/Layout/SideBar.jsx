@@ -1,58 +1,99 @@
-import React from 'react';
+import React, { useState } from 'react';
+import { HiChevronLeft, HiChevronRight } from 'react-icons/hi';
+import { FaTicketAlt, FaTools, FaProjectDiagram, FaDesktop, FaCog } from 'react-icons/fa'; // Importar iconos
+import { useAuth } from '../context/authContext';
 import SidebarTickets from '../TicketsContent/SidebarTickets';
 
-/**
- * props que ayuda a cambiar el contenido de la barra de herramientas
- * según seleccionado en el header.
- * 
- * @param {Object} props - Props del componente.
- * @param {string} props.activeTab - El nombre de la pestaña activa que determina qué ícono resaltar.
- * 
- * @returns {React.ReactElement} - La barra lateral con íconos para las pestañas.
- */
-const Sidebar = ({ activeTab }) => {
-  return (
-    <aside className="w-16 bg-gray-800 text-gray-100 shadow-lg flex flex-col items-center py-6">
-      {/* Imagen de perfil o logo */}
-      <div
-        className="w-12 h-12 bg-cover bg-center rounded-full border-2 border-gray-700 mb-4"
-        style={{ backgroundImage: 'url("https://cdn.usegalileo.ai/sdxl10/a114458c-9a52-45d0-9740-8dc760b86b4e.png")' }}
-      ></div>
+const Sidebar = ({ activeTab, onTabChange }) => {
+  const { userRole } = useAuth();
+  const [isOpen, setIsOpen] = useState(true); // Estado para abrir/cerrar el sidebar
 
-      <nav>
-        <ul className="space-y-4">
-          {/* Ícono para la pestaña 'board' */}
-          {activeTab === 'board' && (
-            <li className={`flex items-center justify-center w-10 h-10 rounded-full ${activeTab === 'board' ? 'bg-gray-800 text-blue-400' : 'bg-gray-700 text-gray-400'} hover:bg-gray-600`}>
-              <span className="text-lg font-semibold">B</span>
-            </li>
-          )}
-          
-          {/* Ícono para la pestaña 'maquinas' */}
-          {activeTab === 'maquinas' && (
-            <li className={`flex items-center justify-center w-10 h-10 rounded-full ${activeTab === 'maquinas' ? 'bg-gray-800 text-green-400' : 'bg-gray-700 text-gray-400'} hover:bg-gray-600`}>
-              <span className="text-lg font-semibold">M</span>
-            </li>
-          )}
-          
-          {/* Ícono para la pestaña 'tickets' */}
-          {activeTab === 'tickets' && (
-            <div>
-              <div className=' m-auto flex'>
-              <li className={`flex items-center justify-center w-20 h-10 rounded-full ${activeTab === 'tickets' ? 'bg-gray-800 text-yellow-400' : 'bg-gray-700 text-gray-400'} hover:bg-gray-600`}>
-                <span className="text-lg font-semibold">T</span>
+  const toggleSidebar = () => {
+    setIsOpen(!isOpen);
+  };
+
+  return (
+    <aside className={`transition-all duration-300 shadow-lg ${isOpen ? 'bg-gray-900 w-64' : 'bg-gray-800 w-20'}`}>
+      {/* Toggle Button */}
+      <div className="flex justify-end">
+        <button
+          onClick={toggleSidebar}
+          className="p-2 rounded-l-lg bg-gray-700 hover:bg-gray-600 transition duration-300"
+        >
+          {isOpen ? <HiChevronLeft size={20} /> : <HiChevronRight size={20} />}
+        </button>
+      </div>
+
+      {/* Profile Section */}
+      <div className="flex flex-col items-center py-6">
+        <div className="w-16 h-16 bg-cover bg-center rounded-full border-2 border-gray-600 mb-2"
+             style={{ backgroundImage: 'url("https://cdn.usegalileo.ai/sdxl10/a114458c-9a52-45d0-9740-8dc760b86b4e.png")' }}>
+        </div>
+        <h2 className={`text-sm font-semibold text-center text-gray-100 transition-all duration-300 ${isOpen ? 'block' : 'hidden'}`}>
+          Ed Roh
+        </h2>
+        <h3 className={`text-xs font-medium text-center text-gray-400 transition-all duration-300 ${isOpen ? 'block' : 'hidden'}`}>
+          VP Fancy Admin
+        </h3>
+      </div>
+
+      {/* Navigation Menu */}
+      <nav className="px-4">
+        <ul className="space-y-3">
+          {/* Categoría de Tablero */}
+          {isOpen && <li className="text-xs text-gray-500 font-light">Tablero</li>}
+          <li onClick={() => onTabChange('board')} className={`flex items-center cursor-pointer ${activeTab === 'board' ? 'text-red-400' : 'text-gray-400'} hover:bg-gray-600`}>
+            <FaDesktop className={`${isOpen ? 'block' : 'hidden'} text-gray-300 ml-2 text-sm`} />
+            <span className={`${isOpen ? 'block' : 'hidden'} text-xs ml-2`}>Tablero</span>
+          </li>
+
+          {/* Categoría de Máquinas */}
+          {isOpen && <li className="text-xs text-gray-500 font-light">Máquinas</li>}
+          <li onClick={() => onTabChange('maquinas')} className={`flex items-center cursor-pointer ${activeTab === 'maquinas' ? 'text-red-400' : 'text-gray-400'} hover:bg-gray-600`}>
+            <FaCog className={`${isOpen ? 'block' : 'hidden'} text-gray-300 ml-2 text-sm`} />
+            <span className={`${isOpen ? 'block' : 'hidden'} text-xs ml-2`}>Máquinas</span>
+          </li>
+          {userRole === 4 && (
+            <>
+              <li onClick={() => onTabChange('mantenimiento')} className={`flex items-center cursor-pointer ${activeTab === 'mantenimiento' ? 'text-red-400' : 'text-gray-400'} hover:bg-gray-600`}>
+                <FaTools className={`${isOpen ? 'block' : 'hidden'} text-gray-300 ml-2 text-sm`} />
+                <span className={`${isOpen ? 'block' : 'hidden'} text-xs ml-2`}>Mantenimiento</span>
               </li>
-              </div>
-              {/* Componente adicional para 'tickets' */}
-              <SidebarTickets className="mt-8" />
+            </>
+          )}
+
+          {/* Categoría de Tickets */}
+          {isOpen && <li className="text-xs text-gray-500 font-light">Tickets</li>}
+          <li onClick={() => onTabChange('tickets')} className={`flex items-center cursor-pointer ${activeTab === 'tickets' ? 'text-red-400' : 'text-gray-400'} hover:bg-gray-600`}>
+            <FaTicketAlt className={`${isOpen ? 'block' : 'hidden'} text-gray-300 ml-2 text-sm`} />
+            <span className={`${isOpen ? 'block' : 'hidden'} text-xs ml-2`}>Tickets</span>
+          </li>
+
+          {/* Componente adicional para 'tickets' si está activo */}
+          {activeTab === 'tickets' && (
+            <div className="mt-2">
+              <SidebarTickets />
             </div>
           )}
 
-          {/* Ícono para la pestaña 'settings'  esto se va a borrar*/}
-          {activeTab === 'settings' && (
-            <li className={`flex items-center justify-center w-10 h-10 rounded-full ${activeTab === 'settings' ? 'bg-gray-800 text-red-400' : 'bg-gray-700 text-gray-400'} hover:bg-gray-600`}>
-              <span className="text-lg font-semibold">S</span>
-            </li>
+          {(userRole === 4 || userRole === 2) && (
+            <>
+              <li onClick={() => onTabChange('Gestion ticktes')} className={`flex items-center cursor-pointer ${activeTab === 'Gestion ticktes' ? 'text-red-400' : 'text-gray-400'} hover:bg-gray-600`}>
+                <FaTicketAlt className={`${isOpen ? 'block' : 'hidden'} text-gray-300 ml-2 text-sm`} />
+                <span className={`${isOpen ? 'block' : 'hidden'} text-xs ml-2`}>Gestión Tickets</span>
+              </li>
+            </>
+          )}
+
+          {/* Sección de Roles */}
+          {userRole === 1 && (
+            <>
+              {isOpen && <li className="text-xs text-gray-500 font-light">Desarrollo</li>}
+              <li onClick={() => onTabChange('desarrollo')} className={`flex items-center cursor-pointer ${activeTab === 'desarrollo' ? 'text-red-400' : 'text-gray-400'} hover:bg-gray-600`}>
+                <FaProjectDiagram className={`${isOpen ? 'block' : 'hidden'} text-gray-300 ml-2 text-sm`} />
+                <span className={`${isOpen ? 'block' : 'hidden'} text-xs ml-2`}>Desarrollo</span>
+              </li>
+            </>
           )}
         </ul>
       </nav>
@@ -61,3 +102,5 @@ const Sidebar = ({ activeTab }) => {
 };
 
 export default Sidebar;
+
+

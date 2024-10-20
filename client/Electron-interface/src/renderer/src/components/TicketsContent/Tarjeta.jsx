@@ -29,7 +29,7 @@ const TicketCard = ({ ticket, onCancel, onEdit, tab }) => {
         <h3 className="text-lg font-bold text-gray-700 mb-2">Ticket #{ticket.id}</h3>
         <button
           onClick={() => setShowDetails(true)}
-          className="text-sm text-blue-600 hover:underline"
+          className="text-sm text-blue-700 hover:underline  text-btn btn-primary"
         >
           Ver detalles
         </button>
@@ -45,13 +45,13 @@ const TicketCard = ({ ticket, onCancel, onEdit, tab }) => {
         </div>
         <div className="flex space-x-1"> {/* Espaciado reducido entre los botones */}
           <button
-            className="bg-red-500 text-white text-xs px-2 py-1 rounded-md hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-red-500"
+            className="bg-red-500 text-gray-200 font-semibold text-xs px-2 py-1 rounded-md hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-red-500"
             onClick={() => onCancel(ticket.id, tab)}
           >
             Cancelar
           </button>
           <button
-            className="bg-blue-500 text-white text-xs px-2 py-1 rounded-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="bg-blue-500 text-gray-200 font-semibold text-xs px-2 py-1 rounded-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500"
           >
             Editar
           </button>
