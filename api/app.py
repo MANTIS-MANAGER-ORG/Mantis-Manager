@@ -1,5 +1,6 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+import cloudinary
 
 from middlewares.auth_midddleware import AuthMiddleware
 from middlewares.logger_middleware import LogRequestsMiddleware
@@ -12,10 +13,9 @@ from routers.machine_router import machine_router
 from routers.solicitud_router import solicitud_router
 from routers.web_sockets_router import ws_router
 from routers.jd_router import jd_router
-
 from models.create_tables import create_tables
 from config.db import init_roles  
-
+from config.config import get_cloudinary_info
 from config.db import get_db, init_roles
 from services.ticket_service import actualizar_prioridad_y_deadline
 from passlib.context import CryptContext
@@ -40,6 +40,14 @@ app = FastAPI(
     title="MANTIS MANAGER API",
     version="0.7.0",
 )
+
+cloudinary_info = get_cloudinary_info()
+
+cloudinary.config(
+    cloud_name=cloudinary_info["cloud_name"],
+    api_key=cloudinary_info["api_key"],
+    api_secret=cloudinary_info["api_secret"]
+)  
 
 # Agregar el middleware de autenticación
 app.add_middleware(AuthMiddleware)
