@@ -26,15 +26,16 @@ const RequestList = ({ onSelectRequest }) => {
   }, []);
 
   if (loading) {
-    return <CircularProgress />;// porbrar circulo de carga 
+    return <CircularProgress />; // Porbar círculo de carga 
   }
 
   if (error) {
     return <div className="text-red-500">{error}</div>;
   }
 
-  if (requests.length === 0) {
-    return <div className="text-gray-500">No pending requests available.</div>;
+  // Verifica si requests es undefined o tiene longitud cero
+  if (!requests || requests.length === 0) {
+    return null; // No mostrar nada
   }
 
   const handleResponse = async (id, action) => {
@@ -50,10 +51,9 @@ const RequestList = ({ onSelectRequest }) => {
 
   return (
     <div className='flex-col justify-center'>
-      
       <table className='justify-center'>
         <thead>
-          <tr className=' bg-slate-50 border-slate-200'>
+          <tr className='bg-slate-50 border-slate-200'>
             <th className="py-4 px-6 text-left font-sans text-sm font-normal leading-none text-slate-500">ID</th>
             <th className="py-4 px-6 text-left font-sans text-sm font-normal leading-none text-slate-500">Description</th>
             <th className="py-4 px-6 text-left font-sans text-sm font-normal leading-none text-slate-500">Status</th>
@@ -69,17 +69,17 @@ const RequestList = ({ onSelectRequest }) => {
             .filter(request => request.status === 'pendiente')
             .map((request) => (
               <tr key={request.id}>
-                <td className="py-4 px-6 text-left border-b boder-slate-200 text-sm font-semibold text-slate-700">{request.id}</td>
-                <td className="py-4 px-6 text-left border-b boder-slate-200 text-sm font-semibold text-slate-700">{request.description}</td>
-                <td className="py-4 px-6 text-left border-b boder-slate-200 text-sm font-semibold text-slate-700">{request.status}</td>
-                <td className="py-4 px-6 text-left border-b boder-slate-200 text-sm font-semibold text-slate-700">{request.type}</td>
-                <td className="py-4 px-6 text-left border-b boder-slate-200 text-sm font-semibold text-slate-700">{request.ticket_id}</td>
-                <td className="py-4 px-6 text-left border-b boder-slate-200 text-sm font-semibold text-slate-700">{request.created_at}</td>
-                <td className='py-4 px-6 text-left border-b boder-slate-200 text-sm font-semibold text-slate-700'>
+                <td className="py-4 px-6 text-left border-b border-slate-200 text-sm font-semibold text-slate-700">{request.id}</td>
+                <td className="py-4 px-6 text-left border-b border-slate-200 text-sm font-semibold text-slate-700">{request.description}</td>
+                <td className="py-4 px-6 text-left border-b border-slate-200 text-sm font-semibold text-slate-700">{request.status}</td>
+                <td className="py-4 px-6 text-left border-b border-slate-200 text-sm font-semibold text-slate-700">{request.type}</td>
+                <td className="py-4 px-6 text-left border-b border-slate-200 text-sm font-semibold text-slate-700">{request.ticket_id}</td>
+                <td className="py-4 px-6 text-left border-b border-slate-200 text-sm font-semibold text-slate-700">{request.created_at}</td>
+                <td className='py-4 px-6 text-left border-b border-slate-200 text-sm font-semibold text-slate-700'>
                   <button 
-                   onClick={() => onSelectRequest(request)}>Ver detalles</button> {/* creo que esto se va a borrar  */ }
+                    onClick={() => onSelectRequest(request)}>Ver detalles</button> {/* Esto se va a borrar */}
                 </td>
-                <td className='py-4 px-6 text-left border-b boder-slate-200 '>
+                <td className='py-4 px-6 text-left border-b border-slate-200 '>
                   <button
                     className="text-green-500 mr-2"
                     onClick={() => handleResponse(request.id, 'aceptada')}

@@ -13,7 +13,7 @@ const Sidebar = ({ activeTab, onTabChange }) => {
   };
 
   return (
-    <aside className={`transition-all duration-300 shadow-lg ${isOpen ? 'bg-gray-900 w-64' : 'bg-gray-800 w-20'}`}>
+    <aside className={`transition-all duration-300 shadow-lg ${isOpen ? 'bg-gray-900 w-64' : 'bg-gray-900 w-20'}`}>
       {/* Toggle Button */}
       <div className="flex justify-end">
         <button
@@ -30,10 +30,10 @@ const Sidebar = ({ activeTab, onTabChange }) => {
              style={{ backgroundImage: 'url("https://cdn.usegalileo.ai/sdxl10/a114458c-9a52-45d0-9740-8dc760b86b4e.png")' }}>
         </div>
         <h2 className={`text-sm font-semibold text-center text-gray-100 transition-all duration-300 ${isOpen ? 'block' : 'hidden'}`}>
-          Ed Roh
+          SR Andrés
         </h2>
         <h3 className={`text-xs font-medium text-center text-gray-400 transition-all duration-300 ${isOpen ? 'block' : 'hidden'}`}>
-          VP Fancy Admin
+          Vp Admin
         </h3>
       </div>
 

@@ -20,7 +20,7 @@ const Header = ({ onTabChange }) => {
   };
 
   return (
-    <header className="bg-gray-800 text-white shadow-md p-4">
+    <header className="bg-gray-900 text-white shadow-md p-4">
       <div className="flex justify-between items-center">
         <h2 className="text-2xl font-bold tracking-tight">Mantis Manager</h2>
 
