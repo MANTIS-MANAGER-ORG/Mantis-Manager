@@ -18,3 +18,7 @@ images
 *test.db
 
 api/prueba.html
+
+
+#Git ignore para el proyecto
+node_modules/
