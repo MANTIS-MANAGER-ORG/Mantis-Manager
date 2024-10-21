@@ -24,7 +24,7 @@ export const TicketProvider = ({ children }) => {
 
   // Función para cargar los tickets desde el backend
   const fetchTickets = async (page = 1, limit = 10) => {
-    const url = `http://127.0.0.1:8000/tickets/tickets?page=${page}&limit=${limit}`;
+    const url = `https://mantis-manager-production-ce86.up.railway.app/tickets/tickets?page=${page}&limit=${limit}`;
 
     try {
       const data = await fetchApi(url, "GET");
@@ -52,7 +52,7 @@ export const TicketProvider = ({ children }) => {
       machine: newTicket.machine,
       priority: newTicket.priority,
     };
-    const url = "http://127.0.0.1:8000/tickets/ticket";
+    const url = "https://mantis-manager-production-ce86.up.railway.app/tickets/ticket";
 
     try {
       const createdTicket = await fetchApi(url, "POST", ticketData);
@@ -66,7 +66,7 @@ export const TicketProvider = ({ children }) => {
     }
   };
 
-  // Función para cancelar un ticket
+  // Función para cancelar un ticket  por ahor no sirve para nada, se podría borra una vez sea adecuado  se necesita un endpoint para eliminar ticket si lo queremos usar 
   const handleCancel = async (ticketId, tab) => {
     try {
       setTicketsData((prevData) => ({
@@ -105,7 +105,7 @@ export const TicketProvider = ({ children }) => {
       return;
     }
 
-    const url = `http://127.0.0.1:8000/tickets/ticket/${ticketId}/${newState}`;
+    const url = `https://mantis-manager-production-ce86.up.railway.app/tickets/ticket/${ticketId}/${newState}`;
 
     try {
       const updatedTicket = await fetchApi(url, "PATCH");
@@ -136,7 +136,7 @@ export const TicketProvider = ({ children }) => {
 
   // Función para asignar un ticket
   const AsignedTicket = async (id, assigned) => {
-    const url = `http://127.0.0.1:8000/tickets/ticket/assing/${id}?user_id=${assigned}`;
+    const url = `https://mantis-manager-production-ce86.up.railway.app/tickets/ticket/assing/${id}?user_id=${assigned}`;
 
     try {
       const updatedTicket = await fetchApi(url, "PATCH");
@@ -161,7 +161,7 @@ export const TicketProvider = ({ children }) => {
       ticket_id: ticketId,
     };
 
-    const url = "http://127.0.0.1:8000/solicitudes";
+    const url = "https://mantis-manager-production-ce86.up.railway.app/solicitudes";
 
     try {
       const createdRequest = await fetchApi(url, "POST", requestData);
@@ -175,8 +175,8 @@ export const TicketProvider = ({ children }) => {
   // Función para obtener solicitudes
   const getRequest = async (id = null) => {
     const url = id
-      ? `http://127.0.0.1:8000/solicitudes/${id}`
-      : `http://127.0.0.1:8000/solicitudes`;
+      ? `https://mantis-manager-production-ce86.up.railway.app/solicitudes/${id}`
+      : `https://mantis-manager-production-ce86.up.railway.app/solicitudes`;
 
     try {
       const data = await fetchApi(url, "GET");
@@ -188,7 +188,7 @@ export const TicketProvider = ({ children }) => {
 
   // Función para responder solicitudes
   const respondeRequest = async (id, response) => {
-    const url = `http://127.0.0.1:8000/solicitudes/${id}/responder`;
+    const url = `https://mantis-manager-production-ce86.up.railway.app/solicitudes/${id}/responder`;
     const body = {
       status: response,
     };

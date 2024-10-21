@@ -49,7 +49,7 @@ const UserManagement = () => {
       }
 
       // Construir la URL con los parámetros de paginación
-      const url = `http://127.0.0.1:8000/jefe_desarrollo/user_info?page=${page}&limit=${limit}`
+      const url = `https://mantis-manager-production-ce86.up.railway.app/jefe_desarrollo/user_info?page=${page}&limit=${limit}`
 
       // Realizar la solicitud a la API
       const response = await fetch(url, {
@@ -135,7 +135,7 @@ const UserManagement = () => {
       // Realizar el fetch a la URL con el ID dinámico
       try {
         const response = await fetch(
-          `http://127.0.0.1:8000/jefe_desarrollo/user_info/${formData.id}`,
+          `https://mantis-manager-production-ce86.up.railway.app/jefe_desarrollo/user_info/${formData.id}`,
           {
             method: 'PATCH',
             headers: {
@@ -219,7 +219,7 @@ const UserManagement = () => {
     try {
       // Llamada al endpoint para eliminar el usuario
       const token = localStorage.getItem('access_token')
-      const response = await fetch(`http://127.0.0.1:8000/jefe_desarrollo/user_info/${userId}`, {
+      const response = await fetch(`https://mantis-manager-production-ce86.up.railway.app/jefe_desarrollo/user_info/${userId}`, {
         method: 'DELETE',
         headers: {
           'Content-Type': 'application/json',

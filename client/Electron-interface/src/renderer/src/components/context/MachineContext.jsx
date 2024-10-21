@@ -45,8 +45,8 @@ const [editingMachineData, setEditingMachineData] = useState({});
 
   const getMachines = async (query = '') => {
     const url = query
-      ? `http://127.0.0.1:8000/machines/machine/${query}`
-      : 'http://127.0.0.1:8000/machines/machines';
+      ? `https://mantis-manager-production-ce86.up.railway.app/machines/machine/${query}`
+      : 'https://mantis-manager-production-ce86.up.railway.app/machines/machines';
 
     try {
       console.log(url);
@@ -66,7 +66,7 @@ const [editingMachineData, setEditingMachineData] = useState({});
 
   const editMachine=async (query, datos)=>{
 
-    const url =`http://127.0.0.1:8000/machines/machine/${query}`;
+    const url =`https://mantis-manager-production-ce86.up.railway.app/machines/machine/${query}`;//"queyyy jaja"
     console.log(datos);
     console.log(query);
     try{
@@ -127,7 +127,7 @@ const [editingMachineData, setEditingMachineData] = useState({});
   }, [textQuery]);
 
   const addMachine = async (newMachine) => {
-    const url = 'http://127.0.0.1:8000/machines/machine';
+    const url = 'https://mantis-manager-production-ce86.up.railway.app/machines/machine';
     try {
       await window.api.fetchApi(url, 'POST', newMachine); 
       getMachines(); // Actualiza la lista después de añadir
@@ -138,7 +138,7 @@ const [editingMachineData, setEditingMachineData] = useState({});
   };
 
   const deleteMachine = async (query) => {
-    const url = `http://127.0.0.1:8000/machines/machine/${query}`;
+    const url = `https://mantis-manager-production-ce86.up.railway.app/machines/machine/${query}`;
     console.log(query);
 
     try {

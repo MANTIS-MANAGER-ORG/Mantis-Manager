@@ -12,7 +12,7 @@ export const AuthProvider = ({ children }) => {
 
   const login = async (id, password) => {
     try {
-      const data = await fetchApi('http://127.0.0.1:8000/login', 'POST', {
+      const data = await fetchApi('https://mantis-manager-production-ce86.up.railway.app/login', 'POST', {
         id,
         password
       });
@@ -21,6 +21,7 @@ export const AuthProvider = ({ children }) => {
       localStorage.setItem('access_token', data.access_token);
       localStorage.setItem('refresh_token', data.refresh_token);
       localStorage.setItem('user', JSON.stringify(data.data));
+      localStorage.setItem('user_id', id);
 
       // Actualizar el estado de autenticación
       setIsAuthenticated(true);
@@ -47,7 +48,7 @@ export const AuthProvider = ({ children }) => {
 
   const register = async (id, first_name, last_name, email, phone, password, role) => {
     try {
-      const data = await fetchApi('http://127.0.0.1:8000/jefe_desarrollo/register', 'POST', {
+      const data = await fetchApi('https://mantis-manager-production-ce86.up.railway.app/jefe_desarrollo/register', 'POST', {
         id,
         first_name,
         last_name,

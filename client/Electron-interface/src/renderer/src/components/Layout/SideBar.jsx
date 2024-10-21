@@ -76,11 +76,12 @@ const Sidebar = ({ activeTab, onTabChange }) => {
             </div>
           )}
 
-          {(userRole === 4 || userRole === 2) && (
+          
+           {(userRole === 4 || userRole === 2) && (
             <>
-              <li onClick={() => onTabChange('Gestion ticktes')} className={`flex items-center cursor-pointer ${activeTab === 'Gestion ticktes' ? 'text-red-400' : 'text-gray-400'} hover:bg-gray-600`}>
+              <li onClick={() => onTabChange('Lista tickets')} className={`flex items-center cursor-pointer ${activeTab === 'Gestion ticktes' ? 'text-red-400' : 'text-gray-400'} hover:bg-gray-600`}>
                 <FaTicketAlt className={`${isOpen ? 'block' : 'hidden'} text-gray-300 ml-2 text-sm`} />
-                <span className={`${isOpen ? 'block' : 'hidden'} text-xs ml-2`}>Gestión Tickets</span>
+                <span className={`${isOpen ? 'block' : 'hidden'} text-xs ml-2`}>Lista tickets</span>
               </li>
             </>
           )}
@@ -95,6 +96,15 @@ const Sidebar = ({ activeTab, onTabChange }) => {
               </li>
             </>
           )}
+
+{isOpen && <li className="text-xs text-gray-500 font-light">Solicitudes</li>}
+          <li onClick={() => onTabChange('Lista Solicitudes')} className={`flex items-center cursor-pointer ${activeTab === 'tickets' ? 'text-red-400' : 'text-gray-400'} hover:bg-gray-600`}>
+            <FaTicketAlt className={`${isOpen ? 'block' : 'hidden'} text-gray-300 ml-2 text-sm`} />
+            <span className={`${isOpen ? 'block' : 'hidden'} text-xs ml-2`}>Solicitudes</span>
+          </li>
+
+         
+
         </ul>
       </nav>
     </aside>
