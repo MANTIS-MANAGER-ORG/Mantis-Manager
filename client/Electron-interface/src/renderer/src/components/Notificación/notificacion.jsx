@@ -1,11 +1,17 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 
 const NotificationComponent = () => {
     const [ws, setWs] = useState(null);
     const [notifications, setNotifications] = useState([]);
     const [isConnected, setIsConnected] = useState(false);
-    const userId = localStorage.getItem('user_id'); // Obtener automáticamente el User ID
+    const userId = localStorage.getItem('user_id');
     const token = localStorage.getItem('access_token');
+    const [showOldNotifications, setShowOldNotifications] = useState(false);
+
+    useEffect(() => {
+        // Conectar al WebSocket automáticamente al montar el componente
+        connectWebSocket();
+    }, []);
 
     const connectWebSocket = () => {
         if (userId) {
@@ -14,8 +20,7 @@ const NotificationComponent = () => {
             websocket.onopen = () => {
                 console.log("Conectado a WebSocket");
                 setIsConnected(true);
-                addMessage("Conectado a WebSocket");
-                // Enviar el token de autenticación al conectar
+                
                 websocket.send(`Authorization: Bearer ${token}`);
             };
 
@@ -40,7 +45,8 @@ const NotificationComponent = () => {
             websocket.onclose = () => {
                 setIsConnected(false);
                 console.log("Desconectado de WebSocket");
-                addMessage("Desconectado de WebSocket");
+                console.log(showOldNotifications)
+               
             };
 
             websocket.onerror = (error) => {
@@ -54,15 +60,10 @@ const NotificationComponent = () => {
         }
     };
 
-    const sendMessage = () => {
-        const message = document.getElementById("message").value; // Obtener el mensaje del input
-        if (!ws || ws.readyState !== WebSocket.OPEN) {
-            alert("WebSocket no está conectado.");
-            return;
-        }
-        ws.send(message);
-        addMessage(`Tú: ${message}`);
-        document.getElementById("message").value = ''; // Limpiar el campo de mensaje
+   
+
+    const addMessage = (message) => {
+        setNotifications((prev) => [...prev, message]);
     };
 
     const getPendingMessages = () => {
@@ -74,64 +75,42 @@ const NotificationComponent = () => {
         addMessage("Tú: get_nosend_messages");
     };
 
-    const authenticateUser = () => {
-        if (!ws || ws.readyState !== WebSocket.OPEN) {
-            alert("WebSocket no está conectado.");
-            return;
-        }
-        ws.send(`Authorization: Bearer ${token}`);
-        addMessage(`Tú: Authorization: ${token}`);
-    };
-
-    const addMessage = (message) => {
-        setNotifications((prev) => [...prev, message]);
-    };
-
-    const disconnectWebSocket = () => {
-        if (ws) {
-            ws.close();
-            setWs(null);
-            setIsConnected(false);
-            console.log("WebSocket cerrado manualmente");
-        }
-    };
-
-    const clearNotifications = () => {
-        setNotifications([]);
+    const handleShowOldNotifications = () => {
+        setShowOldNotifications(true);
+        getPendingMessages(); // Llamar al WebSocket para obtener mensajes pendientes
     };
 
     return (
-        <div>
-            <h2>Notificaciones</h2>
-            <button onClick={connectWebSocket} className='text-black'>Conectar WebSocket</button>
-            <button onClick={disconnectWebSocket} className='text-black'>Desconectar WebSocket</button>
-            <br /><br />
-            <input
-                type="text"
-                id="message"
-                placeholder="Mensaje"
-            />
-            <button onClick={sendMessage} className='text-black'>Enviar Mensaje</button>
-            <button onClick={getPendingMessages} className='text-black'>Obtener Mensajes Pendientes</button>
-            <button onClick={authenticateUser} className='text-black'>Autenticar</button>
-            <button onClick={clearNotifications} className='text-black'>Limpiar Notificaciones</button>
-            <ul>
-                {notifications.length > 0 ? (
-                    notifications.map((notification, index) => (
-                        <li key={index}>{notification}</li>
-                    ))
-                ) : (
-                    <li>No hay notificaciones.</li>
+        <div className="p-2 bg-white flex items-center justify-center">
+            <div className="w-full  bg-white rounded-lg p-2">
+                
+                <div className="overflow-y-auto max-h-60 mb-2">
+                    {notifications.length > 0 ? (
+                        notifications.map((notification, index) => (
+                            <div key={index} className="bg-white p-3 rounded-lg mb-2 text-gray-800">
+                                {notification}
+                            </div>
+                        ))
+                    ) : (
+                        <div className="text-gray-500 text-center text-sm font-light">No hay notificaciones.</div>
+                    )}
+                </div>
+                {!showOldNotifications && (
+                    <button
+                        onClick={handleShowOldNotifications}
+                        className="bg-blue-500 text-white py-2 px-4 rounded-lg w-full"
+                    >
+                        Ver todas las notificaciones
+                    </button>
                 )}
-            </ul>
-            {isConnected ? (
-                <p>Conectado al WebSocket.</p>
-            ) : (
-                <p>No conectado al WebSocket.</p>
-            )}
+                {isConnected ? (
+                    <p className="text-green-600 text-center mt-4">Conectado al WebSocket.</p>
+                ) : (
+                    <p className="text-red-600 text-center mt-4">No conectado al WebSocket.</p>
+                )}
+            </div>
         </div>
     );
 };
 
 export default NotificationComponent;
-

@@ -41,7 +41,7 @@ const Header = ({ onTabChange }) => {
 
           {isSettingsOpen && <Ajustes />}
           {isNotificationsOpen && (
-            <div className="absolute top-16 right-4 bg-white shadow-lg rounded-lg p-4 w-80">
+            <div className="absolute top-16 right-4 bg-white rounded-lg p-4 w-80">
               <TicketNotifications />
             </div>
           )}
