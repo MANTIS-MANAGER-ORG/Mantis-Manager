@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Informe de Reparaciones</title>
+    <style>
+        /* Reset básico */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            padding: 0;
+            font-size: 12pt;
+            line-height: 1.6;
+        }
+
+        h1, h2, h3 {
+            color: #2C3E50;
+        }
+
+        h1 {
+            text-align: center;
+            font-size: 18pt;
+            margin-bottom: 10px;
+        }
+
+        h2 {
+            font-size: 16pt;
+            margin-bottom: 5px;
+        }
+
+        .introduction {
+            text-align: justify;
+            margin-bottom: 1em;
+        }
+
+        .report-header {
+            text-align: center;
+            margin-bottom: 10px;
+        }
+
+        .report-header img {
+            width: 100px;
+            margin-bottom: 10px;
+        }
+
+        .report-info {
+            text-align: right !important;
+            margin-bottom: 40px !important;
+            font-size: 10pt;
+            color: #7F8C8D;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 10pt;
+            margin-bottom: 20px;
+        }
+
+        table, th, td {
+            border: 1px solid #BDC3C7;
+        }
+
+        th, td {
+            padding: 8px;
+            text-align: left;
+        }
+
+        th {
+            background-color: #ECF0F1;
+            color: #2C3E50;
+        }
+
+        .ticket-details {
+            margin-bottom: 15px;
+            page-break-inside: avoid;
+        }
+
+        .description {
+            padding: 10px;
+            background-color: #ECF0F1;
+            border-radius: 5px;
+            margin-bottom: 20px;
+            font-style: italic;
+            line-height: 1.6;
+            page-break-inside: avoid;
+        }
+
+        .footer {
+            text-align: center;
+            margin-top: 20px;
+            font-size: 10pt;
+            color: #95A5A6;
+        }
+
+        /* Estilos para impresión */
+        @media print {
+
+            h1, h2, h3 {
+                page-break-after: avoid; /* Evitar saltos de página después de títulos */
+            }
+
+            #ticket-title {
+                page-break-before: always;
+            }
+
+            .ticket-details, .description, table {
+                page-break-inside: avoid; /* Evitar que las tablas y detalles del ticket se dividan entre páginas */
+            }
+
+            .page-break {
+                display: none; /* Elimina el uso manual de saltos de página */
+            }
+        }
+
+    </style>
+</head>
+<body>
+
+    <div class="report-header">
+        <h1>INFORME DE REPARACIONES - MANTIS-MANAGER</h1>
+        <img src="{{logoUrl}}" alt="Logo de la Empresa">
+    </div>
+
+    <div class="report-info">
+        <p>Fecha de generación: {{generationDate}}</p>
+        <p>Rango de tiempo: {{startDate}} - {{endDate}}</p>
+    </div>
+
+    <p id="p-1" class="introduction">
+        Este informe ha sido generado automáticamente por el sistema Mantis-Manager, y tiene como objetivo proporcionar un análisis detallado de las reparaciones realizadas durante el período especificado. A través de este documento, se puede obtener una visión clara y precisa del estado de los equipos, los problemas reportados, y las soluciones implementadas. El informe está diseñado para ser una herramienta clave en la gestión de mantenimiento, facilitando la supervisión y planificación de las actividades de reparación.
+    </p>
+
+    <p class="introduction">
+        Dentro del contenido del informe se encuentran las principales medidas descriptivas, como el número total de reparaciones efectuadas, los tiempos promedio de respuesta, atención y cierre de incidencias, así como los estados actuales de los equipos involucrados. Además, se incluye información detallada sobre cada ticket generado, abarcando desde la descripción del problema inicial hasta los detalles de la solución aplicada. También se identifican las personas responsables de cada tarea y los recursos utilizados en el proceso de reparación, lo que permite tener un control exhaustivo de cada incidencia.
+    </p>
+
+    <p class="introduction">
+        Este documento no solo proporciona datos operativos, sino que también facilita la identificación de patrones y tendencias en el mantenimiento de los equipos. El análisis de estos datos ayuda a tomar decisiones informadas que mejoren la eficiencia del equipo técnico, anticipen posibles fallas y optimicen los procesos de mantenimiento preventivo. Además, los informes generados son esenciales para evaluar el desempeño general del sistema de mantenimiento y garantizar que los recursos estén siendo utilizados de manera efectiva, reduciendo tiempos de inactividad y mejorando la productividad de la empresa.
+    </p>
+
+    {{#each tickets}}
+    <div class="ticket-details">
+        <h2 id="ticket-title">Ticket #{{id}}</h2>
+
+        <table>
+            <tr>
+                <th>ID del Ticket</th>
+                <td>{{id}}</td>
+            </tr>
+            <tr>
+                <th>Fecha de Creación</th>
+                <td>{{creationDate}}</td>
+            </tr>
+            <tr>
+                <th>Estado</th>
+                <td>{{status}}</td>
+            </tr>
+            <tr>
+                <th>Creador</th>
+                <td>{{creator}}</td>
+            </tr>
+            <tr>
+                <th>Asignado a</th>
+                <td>{{assignedTo}}</td>
+            </tr>
+            <tr>
+                <th>Máquina Asociada</th>
+                <td>{{machineId}} ({{machineName}})</td>
+            </tr>
+            <tr>
+                <th>Solicitud de Cierre</th>
+                <td>{{closureRequest}}</td>
+            </tr>
+            <tr>
+                <th>Fecha de Cierre</th>
+                <td>{{closureDate}}</td>
+            </tr>
+        </table>
+
+        <div class="description">
+            <h3>Descripción del problema</h3>
+            <p>{{problemDescription}}</p>
+
+            <h3>Detalles de la reparación</h3>
+            <p>{{repairDetails}}</p>
+        </div>
+    </div>
+    {{/each}}
+
+    <div class="footer">
+        <p>Informe generado automáticamente por Mantis-Manager</p>
+    </div>
+
+</body>
+</html>
