@@ -1,120 +1,137 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 
-const TicketNotification = ({ notification }) => (
-  <div className="bg-white p-5 shadow-lg rounded-lg flex justify-between items-center mb-3 border-l-4 transition-all duration-200 ease-in-out hover:shadow-xl hover:scale-[1.02] 
-    border-blue-400">
-    <div>
-      <p className="text-sm text-gray-800 font-semibold">
-        {notification.type === 'ticket_request' && `Nueva solicitud de ticket: ${notification.ticketId}`}
-        {notification.type === 'ticket_update' && `Actualización en ticket: ${notification.ticketId}`}
-        {notification.type === 'machine_ready' && `Máquina lista para: ${notification.machine}`}
-      </p>
-      <span className={`block text-xs font-bold mt-1 ${
-        notification.type === 'ticket_request' ? 'text-green-500' 
-        : notification.type === 'ticket_update' ? 'text-yellow-500' 
-        : 'text-blue-500'
-      }`}>
-        {notification.message}
-      </span>
-      <p className="text-xs text-gray-400 mt-2">{notification.time}</p>
-    </div>
-    <button className="text-blue-500 hover:text-blue-600 hover:underline text-sm transition duration-150">
-      Ver Detalles
-    </button>
-  </div>
-);
+const NotificationComponent = () => {
+    const [ws, setWs] = useState(null);
+    const [notifications, setNotifications] = useState([]);
+    const [isConnected, setIsConnected] = useState(false);
+    const userId = localStorage.getItem('user_id'); // Obtener automáticamente el User ID
+    const token = localStorage.getItem('access_token');
 
-const TicketNotifications = () => {
-  const [notifications, setNotifications] = useState([]);
-  const [ws, setWs] = useState(null);
-
-  // Conexión WebSocket
-  useEffect(() => {
     const connectWebSocket = () => {
-      const userId = localStorage.getItem('user_id'); // Obtener el userId del localStorage
-      if (!userId) {
-        alert("User ID no encontrado en el almacenamiento local.");
-        return;
-      }
+        if (userId) {
+            const websocket = new WebSocket(`wss://mantis-manager-production-ce86.up.railway.app/ws/${userId}`);
 
-      const webSocket = new WebSocket(`wss://mantis-manager-production-ce86.up.railway.app/ws/${userId}`);
-      
-      webSocket.onopen = () => {
-        console.log("Conectado a WebSocket");
-      };
+            websocket.onopen = () => {
+                console.log("Conectado a WebSocket");
+                setIsConnected(true);
+                addMessage("Conectado a WebSocket");
+                // Enviar el token de autenticación al conectar
+                websocket.send(`Authorization: Bearer ${token}`);
+            };
 
-      webSocket.onmessage = (event) => {
-        try {
-          const jsonMessage = JSON.parse(event.data);
-          const newNotification = {
-            id: notifications.length + 1,
-            type: jsonMessage.type,
-            ticketId: jsonMessage.ticketId || null,
-            machine: jsonMessage.machine || null,
-            message: jsonMessage.message,
-            time: 'Ahora mismo',
-          };
-          setNotifications((prev) => [newNotification, ...prev]);
-        } catch (e) {
-          console.log("Error al procesar mensaje:", e);
+            websocket.onmessage = (event) => {
+                const message = event.data;
+                console.log(message);
+                try {
+                    const jsonMessage = JSON.parse(message);
+                    if (jsonMessage.error) {
+                        console.error("Error del servidor:", jsonMessage.error);
+                    } else if (jsonMessage.notification) {
+                        setNotifications((prev) => [...prev, jsonMessage.notification]);
+                    } else {
+                        addMessage(`Servidor: ${message}`);
+                    }
+                } catch (error) {
+                    console.error("Error al procesar el mensaje:", error);
+                    addMessage(`Servidor (Texto): ${message}`);
+                }
+            };
+
+            websocket.onclose = () => {
+                setIsConnected(false);
+                console.log("Desconectado de WebSocket");
+                addMessage("Desconectado de WebSocket");
+            };
+
+            websocket.onerror = (error) => {
+                console.error("Error en WebSocket:", error);
+                addMessage("Error en WebSocket.");
+            };
+
+            setWs(websocket);
+        } else {
+            console.error("User ID no encontrado en localStorage.");
         }
-      };
-
-      webSocket.onclose = () => {
-        console.log("Desconectado de WebSocket");
-      };
-
-      webSocket.onerror = (error) => {
-        console.error("Error en WebSocket:", error);
-      };
-
-      setWs(webSocket);
-
-      return () => {
-        if (webSocket) webSocket.close();
-      };
     };
 
-    connectWebSocket();
-  }, [notifications]);
+    const sendMessage = () => {
+        const message = document.getElementById("message").value; // Obtener el mensaje del input
+        if (!ws || ws.readyState !== WebSocket.OPEN) {
+            alert("WebSocket no está conectado.");
+            return;
+        }
+        ws.send(message);
+        addMessage(`Tú: ${message}`);
+        document.getElementById("message").value = ''; // Limpiar el campo de mensaje
+    };
 
-  // Enviar mensajes
-  const sendMessage = (message) => {
-    if (!ws || ws.readyState !== WebSocket.OPEN) {
-      alert("WebSocket no está conectado.");
-      return;
-    }
-    ws.send(message);
-  };
+    const getPendingMessages = () => {
+        if (!ws || ws.readyState !== WebSocket.OPEN) {
+            alert("WebSocket no está conectado.");
+            return;
+        }
+        ws.send("get_nosend_messages");
+        addMessage("Tú: get_nosend_messages");
+    };
 
-  // Obtener mensajes pendientes
-  const getPendingMessages = () => {
-    sendMessage("get_nosend_messages");
-  };
+    const authenticateUser = () => {
+        if (!ws || ws.readyState !== WebSocket.OPEN) {
+            alert("WebSocket no está conectado.");
+            return;
+        }
+        ws.send(`Authorization: Bearer ${token}`);
+        addMessage(`Tú: Authorization: ${token}`);
+    };
 
-  // Función de autenticación de usuario
-  const authenticateUser = () => {
-    const token = "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCIsInR5cGUiOiJhY2Nlc3MifQ.eyJzdWIiOiJhZG1pbiIsInNjb3BlcyI6MSwiZXhwIjoxNzI5MDkzNDM5fQ.gGpS9lPLlAOiNfD5FzyA8kjLdpLw6RhuXv17thxxiUo";
-    sendMessage(`Authorization: ${token}`);
-  };
+    const addMessage = (message) => {
+        setNotifications((prev) => [...prev, message]);
+    };
 
-  return (
-    <div className="max-w-lg mx-auto mt-10">
-      <h3 className="text-2xl font-bold text-gray-800 mb-6">Notificaciones del Sistema de Tickets</h3>
-      <div className="mb-4">
-        <button onClick={() => authenticateUser()} className="bg-blue-500 text-white px-4 py-2 rounded-lg">Autenticar</button>
-        <button onClick={() => getPendingMessages()} className="bg-yellow-500 text-white px-4 py-2 ml-4 rounded-lg">Obtener Mensajes Pendientes</button>
-      </div>
-      <div className="overflow-y-auto h-64 p-5 bg-white rounded-lg shadow-md">
-        {notifications.map((notification) => (
-          <TicketNotification
-            key={notification.id}
-            notification={notification}
-          />
-        ))}
-      </div>
-    </div>
-  );
+    const disconnectWebSocket = () => {
+        if (ws) {
+            ws.close();
+            setWs(null);
+            setIsConnected(false);
+            console.log("WebSocket cerrado manualmente");
+        }
+    };
+
+    const clearNotifications = () => {
+        setNotifications([]);
+    };
+
+    return (
+        <div>
+            <h2>Notificaciones</h2>
+            <button onClick={connectWebSocket} className='text-black'>Conectar WebSocket</button>
+            <button onClick={disconnectWebSocket} className='text-black'>Desconectar WebSocket</button>
+            <br /><br />
+            <input
+                type="text"
+                id="message"
+                placeholder="Mensaje"
+            />
+            <button onClick={sendMessage} className='text-black'>Enviar Mensaje</button>
+            <button onClick={getPendingMessages} className='text-black'>Obtener Mensajes Pendientes</button>
+            <button onClick={authenticateUser} className='text-black'>Autenticar</button>
+            <button onClick={clearNotifications} className='text-black'>Limpiar Notificaciones</button>
+            <ul>
+                {notifications.length > 0 ? (
+                    notifications.map((notification, index) => (
+                        <li key={index}>{notification}</li>
+                    ))
+                ) : (
+                    <li>No hay notificaciones.</li>
+                )}
+            </ul>
+            {isConnected ? (
+                <p>Conectado al WebSocket.</p>
+            ) : (
+                <p>No conectado al WebSocket.</p>
+            )}
+        </div>
+    );
 };
 
-export default TicketNotifications;
+export default NotificationComponent;
+
