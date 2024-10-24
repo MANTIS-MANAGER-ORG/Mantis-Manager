@@ -81,8 +81,16 @@ async def get_report(
     try:
         # Llamar al microservicio de Express
         print(f"https://{get_route_pdf()}/generar-pdf")
+        
+        ruta = get_route_pdf()
+        
+        if "railway.internal" in ruta:
+            ruta = f"http://{ruta}/generar-pdf"
+        else:
+            ruta = f"https://{ruta}/generar-pdf"
+        
         async with httpx.AsyncClient() as client:
-            response = await client.post(f"https://{get_route_pdf()}/generar-pdf", json=data)
+            response = await client.post(ruta, json=data)
 
         # Verificar si la respuesta fue exitosa
         if response.status_code == 200:
