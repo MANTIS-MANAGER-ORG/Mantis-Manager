@@ -18,7 +18,7 @@ admin_router = APIRouter(
     prefix="/admin"
 )
 
-@admin_router.post(
+@admin_router.get(
     "/obtener_reporte",
     summary="Obtener un reporte de tickets de mantenimiento.",
     description="Obtener un reporte del mantenimiento entre ciertas fechas y filtrado por parametros opcionales.",
@@ -80,7 +80,6 @@ async def get_report(
     
     try:
         # Llamar al microservicio de Express
-        print(f"https://{get_route_pdf()}/generar-pdf")
         
         ruta = get_route_pdf()
         
@@ -89,9 +88,11 @@ async def get_report(
         else:
             ruta = f"https://{ruta}/generar-pdf"
         
+        print(ruta)
+        
         async with httpx.AsyncClient() as client:
             response = await client.post(ruta, json=data)
-
+            
         # Verificar si la respuesta fue exitosa
         if response.status_code == 200:
             # Devolver el PDF como respuesta usando StreamingResponse
