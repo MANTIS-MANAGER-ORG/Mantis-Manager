@@ -2,6 +2,7 @@ from sqlalchemy import Column, Integer, String, DateTime, func, Enum, Identity
 from sqlalchemy.orm import relationship
 from sqlalchemy.sql.schema import ForeignKey
 from config.db import Base, engine
+from datetime import datetime
 
 class Ticket(Base):
     """
@@ -63,3 +64,34 @@ class Ticket(Base):
     
     # Relación inversa con Registro
     records = relationship("Registro", back_populates="ticket")  
+    
+    def to_dict(self):
+        
+        solicitud_cierre = None
+        fecha_cierre = None
+        repairDetails = None
+        
+        for solicitud in self.solicitudes:
+            if solicitud.type == 'cierre':
+                solicitud_cierre = f"Solicitud de cierre con id: {solicitud.id}"
+                if solicitud.status == 'respondido':
+                    fecha_cierre = solicitud.created_at.strftime('%Y-%m-%d %H:%M:%S')
+                    if solicitud.response == 'aceptado':
+                        repairDetails = solicitud.description
+                else:
+                    fecha_cierre = 'Pendiente a respuesta'
+        
+        return {
+            "id": self.id,
+            "description": self.description,
+            "state": self.state,
+            "created_at": self.created_at.strftime('%Y-%m-%d %H:%M:%S') if self.created_at else None,
+            "priority": self.priority,
+            "deadline": self.deadline.isoformat() if self.deadline else "No aplica",
+            "machine_id": self.machine_id,
+            "created_by": f"{self.creator.first_name} {self.creator.last_name}",
+            "assigned_to": f"{self.assignee.first_name} {self.assignee.last_name}" if self.assignee else "No asignado aun",
+            "closureRequest": solicitud_cierre if solicitud_cierre else "No hay solicitud de cierre",
+            "closureDate": fecha_cierre if solicitud_cierre else "No aplica",
+            "repairDetails": repairDetails if repairDetails else "Aun no se ha aceptado la solicitud de cierre o no ha sido solucionado" 
+        }

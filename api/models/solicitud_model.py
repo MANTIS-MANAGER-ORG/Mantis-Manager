@@ -34,3 +34,13 @@ class Solicitud(Base):
 
     status = Column(String(100), default='pendiente', nullable=False)
     type = Column(String(100), nullable=False)
+    
+    def to_dict(self):
+        return {
+            "id": self.id,
+            "created_at": self.created_at,
+            "description": self.description,
+            "ticket_id": self.ticket_id,
+            "status": self.status,
+            "type": self.type
+        }

@@ -1,10 +1,10 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 import cloudinary
-
 from middlewares.auth_midddleware import AuthMiddleware
 from middlewares.logger_middleware import LogRequestsMiddleware
 from apscheduler.schedulers.background import BackgroundScheduler
+
 from routers.user_auth_router import user_auth_router
 from routers.tokens_router import tokens_router
 from routers.user_image_router import user_image_router
@@ -13,12 +13,14 @@ from routers.machine_router import machine_router
 from routers.solicitud_router import solicitud_router
 from routers.web_sockets_router import ws_router
 from routers.jd_router import jd_router
+from routers.admin_router import admin_router
+
 from models.create_tables import create_tables
 from config.db import init_roles  
 from config.config import get_cloudinary_info
 from config.db import get_db, init_roles
 from services.ticket_service import actualizar_prioridad_y_deadline
-from passlib.context import CryptContext
+
 
 # Crear las tablas en la base de datos
 create_tables()
@@ -51,6 +53,7 @@ app.include_router(ticket_router)
 app.include_router(machine_router)
 app.include_router(solicitud_router)
 app.include_router(ws_router)
+app.include_router(admin_router)
 
 # Configuración de CORS
 app.add_middleware(
