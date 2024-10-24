@@ -36,6 +36,9 @@ if environment == 'development':
             'api_secret': os.getenv('CLOUDINARY_API_SECRET')
         }
         return cloudinary_info
+    def get_route_pdf() -> str:
+        return os.getenv('ROUTE_MICROSERVICE_PDF')
+    
 else:
     def get_database_url() -> str:
         # Obtiene la URL de la base de datos
@@ -58,3 +61,6 @@ else:
             'api_secret': os.getenv('CLOUDINARY_API_SECRET')
         }
         return cloudinary_info
+    
+    def get_route_pdf() -> str:
+        return os.getenv('ROUTE_MICROSERVICE_PDF')

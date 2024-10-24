@@ -9,7 +9,9 @@ from fastapi.responses import StreamingResponse
 from datetime import datetime
 
 from config.db import get_db
+from config.config import get_route_pdf
 from models.ticket_model import Ticket
+
 
 admin_router = APIRouter(
     tags=["Acciones del personal administrativo"],
@@ -79,7 +81,7 @@ async def get_report(
     try:
         # Llamar al microservicio de Express
         async with httpx.AsyncClient() as client:
-            response = await client.post("https://compassionate-surprise.railway.internal/generar-pdf", json=data)
+            response = await client.post(f"https://{get_route_pdf()}/generar-pdf", json=data)
 
         # Verificar si la respuesta fue exitosa
         if response.status_code == 200:
