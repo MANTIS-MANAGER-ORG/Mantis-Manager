@@ -80,6 +80,7 @@ async def get_report(
     
     try:
         # Llamar al microservicio de Express
+        print(f"https://{get_route_pdf()}/generar-pdf")
         async with httpx.AsyncClient() as client:
             response = await client.post(f"https://{get_route_pdf()}/generar-pdf", json=data)
 
