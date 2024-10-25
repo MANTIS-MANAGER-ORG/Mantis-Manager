@@ -7,37 +7,44 @@ export const useApi = () => {
   const fetchApi = async (url, method = 'GET', body = null, headers = {}) => {
     setLoading(true);
     setError(null);
-    console.log(body);
 
     try {
+      // Detectar si el cuerpo es de tipo FormData para una carga de imagen
+      const isFormData = body instanceof FormData;
+      
+      // Configurar opciones de la solicitud
       const options = {
         method,
         headers: {
           ...headers,
-          
-          'Content-Type': 'application/json',
-
-          'Authorization': `Bearer ${localStorage.getItem('access_token') || ''}`, // Agregar el token si existe
+          // Solo agregar Content-Type si no es FormData
+          ...(isFormData ? {} : { 'Content-Type': 'application/json' }),
+          'Authorization': `Bearer ${localStorage.getItem('access_token') || ''}`, // Agregar token si existe
         },
-        ...(body && { body: JSON.stringify(body) }),
+        // Configurar el cuerpo: serializar a JSON solo si no es FormData
+        body: isFormData ? body : body ? JSON.stringify(body) : null,
       };
 
+      console.log('Opciones de la solicitud:', options);
 
-      console.log(localStorage.getItem('access_token'));
+      // Realizar la solicitud
+      const response = await fetch(url, options);
 
-      // Usar la función fetchApi expuesta en el preload
-      const response = await window.api.fetchApi(url, method, body, headers);
+      if (!response.ok) {
+        throw new Error(`Error en la solicitud: ${response.statusText}`);
+      }
 
-      return response; // Devolver los datos obtenidos
+      // Parsear JSON solo si la respuesta no está vacía
+      const data = await response.json();
+      return data;
     } catch (error) {
       console.error('Error en la solicitud:', error.message);
       setError(error.message);
-      throw error; // Lanzar el error para manejarlo en el componente
+      throw error;
     } finally {
-      setLoading(false); // Cambiar loading a false al final
+      setLoading(false);
     }
   };
 
-  return { fetchApi, loading, error }; // Retornar fetchApi, loading y error
+  return { fetchApi, loading, error };
 };
-

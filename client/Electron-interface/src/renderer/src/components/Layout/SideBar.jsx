@@ -1,16 +1,36 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { HiChevronLeft, HiChevronRight } from 'react-icons/hi';
 import { FaTicketAlt, FaTools, FaProjectDiagram, FaDesktop, FaCog } from 'react-icons/fa'; // Importar iconos
 import { useAuth } from '../context/authContext';
 import SidebarTickets from '../TicketsContent/SidebarTickets';
 
+
 const Sidebar = ({ activeTab, onTabChange }) => {
-  const { userRole } = useAuth();
-  const [isOpen, setIsOpen] = useState(true); // Estado para abrir/cerrar el sidebar
+  const { userRole,get_Image } = useAuth();
+  const [isOpen, setIsOpen] = useState(true);
+  const [ImageN,setImage]=useState('') // Estado para abrir/cerrar el sidebar
 
   const toggleSidebar = () => {
     setIsOpen(!isOpen);
   };
+  useEffect(() => {
+    const fetchImage = async () => {
+      console.log('gola')
+      try {
+        const image = await get_Image();
+        console.log(image.path);
+        setImage(image.path);
+        console.log(ImageN); 
+        console.log(image)// Suponiendo que la URL de la imagen está en 'image.url'
+      } catch (error) {
+        console.error('Error al cargar la imagen de perfil:', error);
+      }
+
+      
+    };
+
+    fetchImage();
+  }, []);
 
   return (
     <aside className={`transition-all duration-300 shadow-lg ${isOpen ? 'bg-gray-900 w-64' : 'bg-gray-900 w-20'}`}>
@@ -26,8 +46,8 @@ const Sidebar = ({ activeTab, onTabChange }) => {
 
       {/* Profile Section */}
       <div className="flex flex-col items-center py-6">
-        <div className="w-16 h-16 bg-cover bg-center rounded-full border-2 border-gray-600 mb-2"
-             style={{ backgroundImage: 'url("https://cdn.usegalileo.ai/sdxl10/a114458c-9a52-45d0-9740-8dc760b86b4e.png")' }}>
+        <div className="w-16 h-16 bg-cover bg-center rounded-full border-2 border-gray-600 mb-2 "
+             style={{ backgroundImage: `url("${localStorage.getItem('foto')}")` }}>
         </div>
         <h2 className={`text-sm font-semibold text-center text-gray-100 transition-all duration-300 ${isOpen ? 'block' : 'hidden'}`}>
           SR Andrés
