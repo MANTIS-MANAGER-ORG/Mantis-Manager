@@ -3,8 +3,11 @@ module.exports = {
     "./src/**/*.{js,jsx,ts,tsx}",
     "./public/index.html",
   ],
+  darkMode: 'class', // Habilita el modo oscuro por clase
   theme: {
-    extend: {},
+    extend: {
+      // Puedes agregar personalizaciones aquí si lo necesitas
+    },
   },
   plugins: [],
 }

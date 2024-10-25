@@ -31,7 +31,7 @@ export const SessionProvider = ({ children }) => {
 
   const refreshToken = async () => {
     console.log('Refrescando token...');
-    const url = 'http://127.0.0.1:8000/refresh'; // Endpoint para refrescar el token
+    const url = 'https://mantis-manager-production-ce86.up.railway.app/token/refresh'; // Endpoint para refrescar el token
 
     try {
       const data = await fetchApi(url, 'POST'); // Utilizar el hook de API para refrescar token

@@ -1,66 +1,116 @@
 import React, { useState, useEffect } from 'react';
 
-const TicketNotification = ({ notification }) => (
-  <div className="bg-white p-5 shadow-lg rounded-lg flex justify-between items-center mb-3 border-l-4 transition-all duration-200 ease-in-out hover:shadow-xl hover:scale-[1.02] 
-    border-blue-400">
-    <div>
-      <p className="text-sm text-gray-800 font-semibold">
-        {notification.type === 'ticket_request' && `Nueva solicitud de ticket: ${notification.ticketId}`}
-        {notification.type === 'ticket_update' && `Actualización en ticket: ${notification.ticketId}`}
-        {notification.type === 'machine_ready' && `Máquina lista para: ${notification.machine}`}
-      </p>
-      <span className={`block text-xs font-bold mt-1 ${
-        notification.type === 'ticket_request' ? 'text-green-500' 
-        : notification.type === 'ticket_update' ? 'text-yellow-500' 
-        : 'text-blue-500'
-      }`}>
-        {notification.message}
-      </span>
-      <p className="text-xs text-gray-400 mt-2">{notification.time}</p>
-    </div>
-    <button className="text-blue-500 hover:text-blue-600 hover:underline text-sm transition duration-150">
-      Ver Detalles
-    </button>
-  </div>
-);
+const NotificationComponent = () => {
+    const [ws, setWs] = useState(null);
+    const [notifications, setNotifications] = useState([]);
+    const [isConnected, setIsConnected] = useState(false);
+    const userId = localStorage.getItem('user_id');
+    const token = localStorage.getItem('access_token');
+    const [showOldNotifications, setShowOldNotifications] = useState(false);
 
-const TicketNotifications = () => {
-  const [notifications, setNotifications] = useState([
-    { id: 1, type: 'ticket_request', ticketId: 123, message: 'Solicitud de nuevo ticket.', time: 'Hace 5 min' },
-    { id: 2, type: 'ticket_update', ticketId: 124, message: 'El ticket ha sido actualizado.', time: 'Hace 15 min' },
-    { id: 3, type: 'machine_ready', machine: 'Cortadora #5', message: 'La máquina está lista.', time: 'Hace 30 min' },
-  ]);
+    useEffect(() => {
+        // Conectar al WebSocket automáticamente al montar el componente
+        connectWebSocket();
+    }, []);
 
-  // Simulación de llegada de nuevas notificaciones
-  useEffect(() => {
-    const interval = setInterval(() => {
-      const newNotification = {
-        id: notifications.length + 1,
-        type: ['ticket_request', 'ticket_update', 'machine_ready'][Math.floor(Math.random() * 3)],
-        ticketId: notifications.length + 100,
-        machine: `Máquina ${Math.floor(Math.random() * 10) + 1}`,
-        message: 'Nueva actualización generada.',
-        time: 'Hace unos segundos',
-      };
-      setNotifications((prev) => [newNotification, ...prev]);
-    }, 15000); // Nuevas notificaciones cada 15 segundos
+    const connectWebSocket = () => {
+        if (userId) {
+            const websocket = new WebSocket(`wss://mantis-manager-production-ce86.up.railway.app/ws/${userId}`);
 
-    return () => clearInterval(interval);
-  }, [notifications]);
+            websocket.onopen = () => {
+                console.log("Conectado a WebSocket");
+                setIsConnected(true);
+                
+                websocket.send(`Authorization: Bearer ${token}`);
+            };
 
-  return (
-    <div className="max-w-lg mx-auto mt-10">
-      <h3 className="text-2xl font-bold text-gray-800 mb-6">Notificaciones del Sistema de Tickets</h3>
-      <div className="overflow-y-auto h-64 p-5 bg-white rounded-lg shadow-md">
-        {notifications.map((notification) => (
-          <TicketNotification
-            key={notification.id}
-            notification={notification}
-          />
-        ))}
-      </div>
-    </div>
-  );
+            websocket.onmessage = (event) => {
+                const message = event.data;
+                console.log(message);
+                try {
+                    const jsonMessage = JSON.parse(message);
+                    if (jsonMessage.error) {
+                        console.error("Error del servidor:", jsonMessage.error);
+                    } else if (jsonMessage.notification) {
+                        setNotifications((prev) => [...prev, jsonMessage.notification]);
+                    } else {
+                        addMessage(`Servidor: ${message}`);
+                    }
+                } catch (error) {
+                    console.error("Error al procesar el mensaje:", error);
+                    addMessage(`Servidor (Texto): ${message}`);
+                }
+            };
+
+            websocket.onclose = () => {
+                setIsConnected(false);
+                console.log("Desconectado de WebSocket");
+                console.log(showOldNotifications)
+               
+            };
+
+            websocket.onerror = (error) => {
+                console.error("Error en WebSocket:", error);
+                addMessage("Error en WebSocket.");
+            };
+
+            setWs(websocket);
+        } else {
+            console.error("User ID no encontrado en localStorage.");
+        }
+    };
+
+   
+
+    const addMessage = (message) => {
+        setNotifications((prev) => [...prev, message]);
+    };
+
+    const getPendingMessages = () => {
+        if (!ws || ws.readyState !== WebSocket.OPEN) {
+            alert("WebSocket no está conectado.");
+            return;
+        }
+        ws.send("get_nosend_messages");
+        addMessage("Tú: get_nosend_messages");
+    };
+
+    const handleShowOldNotifications = () => {
+        setShowOldNotifications(true);
+        getPendingMessages(); // Llamar al WebSocket para obtener mensajes pendientes
+    };
+
+    return (
+        <div className="p-2 bg-white flex items-center justify-center">
+            <div className="w-full  bg-white rounded-lg p-2">
+                
+                <div className="overflow-y-auto max-h-60 mb-2">
+                    {notifications.length > 0 ? (
+                        notifications.map((notification, index) => (
+                            <div key={index} className="bg-white p-3 rounded-lg mb-2 text-gray-800">
+                                {notification}
+                            </div>
+                        ))
+                    ) : (
+                        <div className="text-gray-500 text-center text-sm font-light">No hay notificaciones.</div>
+                    )}
+                </div>
+                {!showOldNotifications && (
+                    <button
+                        onClick={handleShowOldNotifications}
+                        className="bg-blue-500 text-white py-2 px-4 rounded-lg w-full"
+                    >
+                        Ver todas las notificaciones
+                    </button>
+                )}
+                {isConnected ? (
+                    <p className="text-green-600 text-center mt-4">Conectado al WebSocket.</p>
+                ) : (
+                    <p className="text-red-600 text-center mt-4">No conectado al WebSocket.</p>
+                )}
+            </div>
+        </div>
+    );
 };
 
-export default TicketNotifications;
+export default NotificationComponent;

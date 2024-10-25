@@ -1,10 +1,11 @@
+// En el archivo AuthContext.js
 import React, { createContext, useState, useContext } from 'react';
-import { useApi } from '../hooks/apiHook'; // Importamos el custom hook
+import { useApi } from '../hooks/apiHook';
 
 const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
-  const { fetchApi, loading, error } = useApi(); // Usamos el custom hook
+  const { fetchApi, loading, error } = useApi();
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [userRole, setUserRole] = useState(0);
   const [accessToken, setAccessToken] = useState('');
@@ -12,21 +13,23 @@ export const AuthProvider = ({ children }) => {
 
   const login = async (id, password) => {
     try {
-      const data = await fetchApi('http://127.0.0.1:8000/login', 'POST', {
+      const data = await fetchApi('https://mantis-manager-production-ce86.up.railway.app/login', 'POST', {
         id,
         password
       });
 
-      // Guardar tokens y datos del usuario en localStorage
       localStorage.setItem('access_token', data.access_token);
       localStorage.setItem('refresh_token', data.refresh_token);
       localStorage.setItem('user', JSON.stringify(data.data));
+      localStorage.setItem('user_id', id);
 
-      // Actualizar el estado de autenticación
       setIsAuthenticated(true);
       setUserRole(data.data.role_id);
       setAccessToken(data.access_token);
       setRefreshToken(data.refresh_token);
+
+      const userImage = await get_Image();
+      console.log('Imagen del usuario:', userImage);
 
       return data;
     } catch (error) {
@@ -45,35 +48,49 @@ export const AuthProvider = ({ children }) => {
     setRefreshToken('');
   };
 
-  const register = async (id, first_name, last_name, email, phone, password, role) => {
+  const get_Image = async () => {
+    const url = `https://mantis-manager-production-ce86.up.railway.app/users/image/${localStorage.getItem('user_id')}`;
     try {
-      const data = await fetchApi('http://127.0.0.1:8000/jefe_desarrollo/register', 'POST', {
-        id,
-        first_name,
-        last_name,
-        email,
-        phone: phone.toString(),
-        password,
-        role
+      const data = await fetchApi(url);
+      localStorage.setItem('foto', data.path);
+      return data;
+    } catch (error) {
+      console.error('Error:', error);
+      throw error;
+    }
+  };
+
+  // Nueva función para cargar la imagen usando fetchApi
+  const uploadImage = async (profileImage) => {
+    const url = 'https://mantis-manager-production-ce86.up.railway.app/users/upload/admin';
+    const formData = new FormData();
+    formData.append('file', profileImage);
+
+    try {
+      const token = localStorage.getItem('access_token');
+      const data = await fetchApi(url, 'POST', formData, {
+        accept: 'application/json',
+        Authorization: `Bearer ${token}`,
       });
 
-      console.log(data.data);
-      return data.data;
+      return data;
     } catch (error) {
+      console.error(error);
       throw error;
     }
   };
 
   return (
     <AuthContext.Provider value={{
+      get_Image,
+      uploadImage, // Añadir la función al contexto
       isAuthenticated,
       userRole,
       login,
       logout,
-      register,
       accessToken,
       refreshToken,
-      loading, // Puedes usar loading y error en los componentes
+      loading,
       error
     }}>
       {children}

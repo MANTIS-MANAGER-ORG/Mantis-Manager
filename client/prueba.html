@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WebSocket Test</title>
+</head>
+<body>
+    <h1>WebSocket Test</h1>
+    <input type="text" id="user_id" placeholder="User ID" />
+    <button onclick="connectWebSocket()">Connect</button>
+    <br/><br/>
+    <input type="text" id="message" placeholder="Message" />
+    <button onclick="sendMessage()">Send</button>
+    <button onclick="getPendingMessages()">Get Pending Messages</button>
+    <button onclick="authenticateUser()">Authenticate</button> <!-- Botón de autenticación -->
+    <ul id="messages"></ul>
+
+    <script>
+        let ws;
+
+        function connectWebSocket() {
+            const userId = document.getElementById("user_id").value;
+            if (!userId) {
+                alert("Por favor, ingresa un User ID.");
+                return;
+            }
+
+            // Conexión al WebSocket en producción
+            ws = new WebSocket(`wss://mantis-manager-production-ce86.up.railway.app/ws/${userId}`);
+
+            ws.onopen = () => {
+                console.log("Conectado a WebSocket");
+                addMessage("Conectado a WebSocket");
+            };
+
+            ws.onmessage = (event) => {
+                console.log("Mensaje recibido:", event.data);
+
+                let message = event.data;
+
+                try {
+                    const jsonMessage = JSON.parse(message);
+                    addMessage(`Servidor (JSON): ${JSON.stringify(jsonMessage, null, 2)}`);
+                } catch (e) {
+                    addMessage(`Servidor (Texto): ${message}`);
+                }
+            };
+
+            ws.onclose = (event) => {
+                console.log("Desconectado de WebSocket");
+                addMessage("Desconectado de WebSocket");
+                if (event.wasClean) {
+                    addMessage(`Código de cierre: ${event.code} | Razón: ${event.reason}`);
+                } else {
+                    addMessage("Conexión WebSocket cerrada inesperadamente.");
+                }
+            };
+
+            ws.onerror = (error) => {
+                console.error("Error en WebSocket:", error);
+                addMessage("Error en WebSocket.");
+            };
+        }
+
+        function sendMessage() {
+            const message = document.getElementById("message").value;
+            if (!ws || ws.readyState !== WebSocket.OPEN) {
+                alert("WebSocket no está conectado.");
+                return;
+            }
+            ws.send(message);
+            addMessage(`Tú: ${message}`);
+            document.getElementById("message").value = "";
+        }
+
+        function getPendingMessages() {
+            if (!ws || ws.readyState !== WebSocket.OPEN) {
+                alert("WebSocket no está conectado.");
+                return;
+            }
+            ws.send("get_nosend_messages");
+            addMessage("Tú: get_nosend_messages");
+        }
+
+        function authenticateUser() {
+            const token = "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCIsInR5cGUiOiJhY2Nlc3MifQ.eyJzdWIiOiJhZG1pbiIsInNjb3BlcyI6MSwiZXhwIjoxNzI5MDkzNDM5fQ.gGpS9lPLlAOiNfD5FzyA8kjLdpLw6RhuXv17thxxiUo";
+            if (!ws || ws.readyState !== WebSocket.OPEN) {
+                alert("WebSocket no está conectado.");
+                return;
+            }
+            ws.send(`Authorization: ${token}`);
+            addMessage(`Tú: Authorization: ${token}`);
+        }
+
+        function addMessage(message) {
+            const messages = document.getElementById("messages");
+            const li = document.createElement("li");
+            li.textContent = message;
+            messages.appendChild(li);
+        }
+    </script>
+</body>
+</html>

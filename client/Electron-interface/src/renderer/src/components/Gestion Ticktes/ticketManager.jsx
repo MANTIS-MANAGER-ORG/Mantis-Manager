@@ -2,10 +2,12 @@ import React, { useState } from 'react';
 import TicketList from './TieckteList';
 import RequestsManager from './RequestManager';
 import { HiChevronDown } from 'react-icons/hi';
+import { useTicketContext } from '../context/ticketContext';
 
 const TicketsManager = () => {
+  const {activeSession, setActiveSection}= useTicketContext();
   const [menuOpen, setMenuOpen] = useState(false);
-  const [activeSection, setActiveSection] = useState(null);
+  
 
   const toggleMenu = () => {
     setMenuOpen(!menuOpen);
@@ -54,16 +56,16 @@ const TicketsManager = () => {
       </div>
 
       {/* Mostrar componente según la sección activa */}
-      {activeSection === 'list' && (
+      {activeSession=== 'list' && (
         
         
           <TicketList />
         
       )}
 
-      {activeSection === 'requests' && (
-        <div className="bg-white p-6 rounded-lg shadow-lg transition-transform transform hover:scale-105 duration-300 mt-4">
-          <h2 className="text-2xl font-semibold mb-4 text-blue-600">Gestión de Solicitudes</h2>
+      {activeSession === 'requests' && (
+        <div className="bg-white rounded-lg mt-4 mx-auto w-3/4 p-6">
+          <h2 className="text-2xl font-semibold mb-4  text-black text-center">Gestión de Solicitudes</h2>
           <RequestsManager />
         </div>
       )}

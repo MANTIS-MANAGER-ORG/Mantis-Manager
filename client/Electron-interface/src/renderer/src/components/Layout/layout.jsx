@@ -22,7 +22,7 @@ const Layout = () => {
                 <div className="app-container">
                     <Header onTabChange={handleTabChange} />
                     <div className="main-container">
-                        <Sidebar activeTab={activeTab} />
+                        <Sidebar activeTab={activeTab} onTabChange={handleTabChange} />
                         <MainContent activeTab={activeTab} />
 
                         {/* Define las rutas aquí */}
