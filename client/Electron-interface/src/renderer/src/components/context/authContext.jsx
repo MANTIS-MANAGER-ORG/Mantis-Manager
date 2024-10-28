@@ -18,12 +18,14 @@ export const AuthProvider = ({ children }) => {
                 id,
                 password
             });
+            console.log(data.access_token)
 
             localStorage.setItem('access_token', data.access_token);
             localStorage.setItem('refresh_token', data.refresh_token);
             localStorage.setItem('user', JSON.stringify(data.data));
             localStorage.setItem('user_id', id);
             localStorage.setItem('name', JSON.stringify(data.data.first_name));
+            console.log(localStorage.getItem('acces_token'));
 
             // Establecer el WebSocket
             const newWebSocket = new WebSocket(`wss://mantis-manager-production-ce86.up.railway.app/ws/${id}`);

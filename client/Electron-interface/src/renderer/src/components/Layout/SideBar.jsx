@@ -123,6 +123,19 @@ const Sidebar = ({ activeTab, onTabChange }) => {
             <span className={`${isOpen ? 'block' : 'hidden'} text-xs ml-2`}>Solicitudes</span>
           </li>
 
+
+
+{userRole === 1 && (
+            <>
+              {isOpen && <li className="text-xs text-gray-500 font-light">Reportes</li>}
+              <li onClick={() => onTabChange('Reportes Maquinas')} className={`flex items-center cursor-pointer ${activeTab === 'desarrollo' ? 'text-red-400' : 'text-gray-400'} hover:bg-gray-600`}>
+                <FaProjectDiagram className={`${isOpen ? 'block' : 'hidden'} text-gray-300 ml-2 text-sm`} />
+                <span className={`${isOpen ? 'block' : 'hidden'} text-xs ml-2`}>Reportes Máquinas</span>
+              </li>
+            </>
+          )}
+
+
          
 
         </ul>
