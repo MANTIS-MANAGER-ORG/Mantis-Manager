@@ -35,8 +35,8 @@ const MiComponente = () => {
       console.error('Error al obtener el PDF:', error);
     }
   };
-
-  const handleDownload = () => {
+  /*
+   const handleDownload = () => {
     if (pdfData) {
       const urlBlob = URL.createObjectURL(pdfData);
       const a = document.createElement('a');
@@ -48,6 +48,7 @@ const MiComponente = () => {
       URL.revokeObjectURL(urlBlob);
     }
   };
+  */
 
   return (
     <div className="flex flex-col space-y-4">
@@ -127,12 +128,7 @@ const MiComponente = () => {
             
           ></iframe>
           {/* Botón para descargar el PDF */}
-          <button
-            onClick={handleDownload}
-            className="mt-2 bg-green-500 text-white p-2 rounded hover:bg-green-600"
-          >
-            
-          </button>
+          
         </div>
       )}
     </div>
