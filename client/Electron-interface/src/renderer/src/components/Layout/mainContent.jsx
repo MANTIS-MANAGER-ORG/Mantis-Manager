@@ -8,6 +8,7 @@ import Mantenimiento from '../Mantenimietno/Mantenimiento'
 import ListaSolicitudes from '../Gestion Ticktes/RequestList'
 
 import ListaTickets from '../Gestion Ticktes/TieckteList'
+import ReportesMaquinas from '../reportesDescargables/reportesMaquina';
 
 /**
  * Componente principal para mostrar el contenido basado en la pestaña activa.
@@ -33,6 +34,7 @@ const MainContent = ({ activeTab }) => {
         {activeTab === 'desarrollo'&& <Desarrollo/>}
         {activeTab === 'mantenimiento'&& <Mantenimiento/>}
         {activeTab === 'Lista Solicitudes' && <ListaSolicitudes/>}
+        {activeTab=== 'Reportes Maquinas' && <ReportesMaquinas/>}
         
       </div>
     </main>

@@ -1,27 +1,22 @@
 import React, { useState, useEffect } from 'react';
+import { useAuth } from '../context/authContext';
 
-const NotificationComponent = () => {
-    const [ws, setWs] = useState(null);
+const NotificationComponent = ({ isOpen }) => {
+    const { websocket, isConnected, setIsConnected } = useAuth();
     const [notifications, setNotifications] = useState([]);
-    const [isConnected, setIsConnected] = useState(false);
+    
     const userId = localStorage.getItem('user_id');
     const token = localStorage.getItem('access_token');
     const [showOldNotifications, setShowOldNotifications] = useState(false);
 
     useEffect(() => {
-        // Conectar al WebSocket automáticamente al montar el componente
-        connectWebSocket();
-    }, []);
-
-    const connectWebSocket = () => {
-        if (userId) {
-            const websocket = new WebSocket(`wss://mantis-manager-production-ce86.up.railway.app/ws/${userId}`);
-
+        if (websocket) {
+            // Set up WebSocket event handlers
             websocket.onopen = () => {
-                console.log("Conectado a WebSocket");
-                setIsConnected(true);
+                console.log("Conectado al WebSocket");
                 
                 websocket.send(`Authorization: Bearer ${token}`);
+                setIsConnected(true);
             };
 
             websocket.onmessage = (event) => {
@@ -43,10 +38,9 @@ const NotificationComponent = () => {
             };
 
             websocket.onclose = () => {
+                
+                console.log("Desconectado del WebSocket");
                 setIsConnected(false);
-                console.log("Desconectado de WebSocket");
-                console.log(showOldNotifications)
-               
             };
 
             websocket.onerror = (error) => {
@@ -54,24 +48,29 @@ const NotificationComponent = () => {
                 addMessage("Error en WebSocket.");
             };
 
-            setWs(websocket);
+            return () => {
+                // Cleanup on component unmount
+                websocket.onopen = null;
+                websocket.onmessage = null;
+                websocket.onclose = null;
+                websocket.onerror = null;
+                console.log("Manejadores de WebSocket eliminados.");
+            };
         } else {
-            console.error("User ID no encontrado en localStorage.");
+            console.error("WebSocket no está disponible.");
         }
-    };
-
-   
+    }, [websocket]); // Depend on websocket to set up listeners when it changes
 
     const addMessage = (message) => {
         setNotifications((prev) => [...prev, message]);
     };
 
     const getPendingMessages = () => {
-        if (!ws || ws.readyState !== WebSocket.OPEN) {
+        if (!websocket || websocket.readyState !== WebSocket.OPEN) {
             alert("WebSocket no está conectado.");
             return;
         }
-        ws.send("get_nosend_messages");
+        websocket.send("get_nosend_messages");
         addMessage("Tú: get_nosend_messages");
     };
 
@@ -82,8 +81,7 @@ const NotificationComponent = () => {
 
     return (
         <div className="p-2 bg-white flex items-center justify-center">
-            <div className="w-full  bg-white rounded-lg p-2">
-                
+            <div className="w-full bg-white rounded-lg p-2">
                 <div className="overflow-y-auto max-h-60 mb-2">
                     {notifications.length > 0 ? (
                         notifications.map((notification, index) => (
