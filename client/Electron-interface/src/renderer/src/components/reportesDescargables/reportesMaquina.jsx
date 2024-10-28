@@ -6,19 +6,19 @@ const MiComponente = () => {
   const [inputValue, setInputValue] = useState('');
   const [fechaInicio, setFechaInicio] = useState('');
   const [fechaFinal, setFechaFinal] = useState('');
+  const [pdfData, setPdfData] = useState(null);
   const { fetchPdf, loading, error } = useApi();
 
   const handleSelectChange = (event) => {
     setSelectedOption(event.target.value);
-    setInputValue(''); // Resetea el valor del input al cambiar la opción
+    setInputValue('');
   };
 
   const handleInputChange = (event) => {
     setInputValue(event.target.value);
   };
 
-  const handleDownload = async () => {
-    // Invertimos las fechas para que coincidan con el formato YYYY-MM-DD
+  const handleSearch = async () => {
     const url = `https://mantis-manager-production-ce86.up.railway.app/admin/obtener_reporte?initial_date=${fechaInicio}&final_date=${fechaFinal}${
       selectedOption === 'maquina' ? `&machine_id=${inputValue}` : 
       selectedOption === 'id creador' ? `&user_id=${inputValue}` : 
@@ -27,20 +27,25 @@ const MiComponente = () => {
 
     try {
       const { data, isPdf } = await fetchPdf(url, 'GET');
-
+      
       if (isPdf) {
-        // Crear un enlace para la descarga del PDF
-        const urlBlob = URL.createObjectURL(data);
-        const a = document.createElement('a');
-        a.href = urlBlob;
-        a.download = 'reporte.pdf'; // Nombre del archivo descargado
-        document.body.appendChild(a);
-        a.click();
-        document.body.removeChild(a);
-        URL.revokeObjectURL(urlBlob); // Liberar la URL del Blob
+        setPdfData(data); // Guarda el PDF en el estado para previsualización
       }
     } catch (error) {
-      console.error('Error al descargar el PDF:', error);
+      console.error('Error al obtener el PDF:', error);
+    }
+  };
+
+  const handleDownload = () => {
+    if (pdfData) {
+      const urlBlob = URL.createObjectURL(pdfData);
+      const a = document.createElement('a');
+      a.href = urlBlob;
+      a.download = 'reporte.pdf';
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(urlBlob);
     }
   };
 
@@ -94,23 +99,45 @@ const MiComponente = () => {
           onChange={handleInputChange}
           className={`w-1/2 p-2 border border-gray-300 rounded ${!selectedOption ? 'opacity-50 cursor-not-allowed' : ''}`}
           placeholder={selectedOption === 'maquina' ? `Ingrese ${selectedOption}` : 'Ingrese Id '}
-          disabled={!selectedOption} // Desactiva la entrada si no hay opción seleccionada
+          disabled={!selectedOption}
         />
       </div>
 
-      {/* Botón para descargar */}
+      {/* Botón para buscar el PDF */}
       <button
-        onClick={handleDownload}
+        onClick={handleSearch}
         className="bg-blue-500 text-white p-2 rounded hover:bg-blue-600 disabled:bg-gray-400"
         disabled={!fechaInicio || !fechaFinal} // Desactiva el botón si no hay fechas
       >
-        Descargar
+        Buscar
       </button>
 
+      {/* Mostrar mensaje de carga o error */}
       {loading && <p>Cargando...</p>}
       {error && <p className="text-red-500">{error}</p>}
+
+      {/* Mostrar previsualización del PDF */}
+      {pdfData && (
+        <div className="mt-4 bg-red-200">
+          <iframe
+            src={URL.createObjectURL(pdfData)}
+            width="100%"
+            height="600px"
+            title="Previsualización del PDF"
+            
+          ></iframe>
+          {/* Botón para descargar el PDF */}
+          <button
+            onClick={handleDownload}
+            className="mt-2 bg-green-500 text-white p-2 rounded hover:bg-green-600"
+          >
+            
+          </button>
+        </div>
+      )}
     </div>
   );
 };
 
 export default MiComponente;
+
