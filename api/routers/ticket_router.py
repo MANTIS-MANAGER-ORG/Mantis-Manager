@@ -212,7 +212,6 @@ async def create_ticket(
         {
             "message": f"Has creado un nuevo ticket con ID {new_ticket.id} para la máquina {machine.id}.",
             "type":"info",
-            "timestamp": datetime.now().isoformat()
         },
         user_id
     )
@@ -382,7 +381,6 @@ async def assign_ticket(
         {
             "message": f"Se ha asignado tu ticket con id {ticket.id} para la maquina {ticket.machine_id} a {user.first_name} {user.last_name}. (id: {user.id})",
             "type":"info",
-            "timestamp": datetime.now().isoformat()
         },
         ticket.created_by
     )
@@ -391,7 +389,6 @@ async def assign_ticket(
         {
             "message": f"Se te ha asignado el ticket con id {ticket.id} para la maquina {ticket.machine_id}",
             "type":"info",
-            "timestamp": datetime.now().isoformat()
         },
         user.id
     )
@@ -487,7 +484,6 @@ async def change_ticket_state(
         {
             "message": f"Se ha cambiado el estado de tu ticket con id {ticket.id} para la maquina {ticket.machine_id} a {ticket_state}.",
             "type":"info",
-            "timestamp": datetime.now().isoformat()
         },
         ticket.created_by
     )
@@ -496,7 +492,6 @@ async def change_ticket_state(
         {
             "message": f"Se ha cambiado el estado del ticket con id {ticket.id} para la maquina {ticket.machine_id} del que eres encargado a {ticket_state}.",
             "type":"info",
-            "timestamp": datetime.now().isoformat()
         },
         ticket.assigned_to
     )
@@ -599,7 +594,6 @@ async def request_ticket_closure(
         {
             "message": f"Se ha solicitado el cierre de tu ticket con id {ticket.id} para la maquina {ticket.machine_id}",
             "type":"info",
-            "timestamp": datetime.now().isoformat()
         },
         ticket.created_by
     )
@@ -608,7 +602,6 @@ async def request_ticket_closure(
         {
             "message": f"Se ha solicitado el cierre del ticket con id {ticket.id} para la maquina {ticket.machine_id} del que eres encargado a.",
             "type":"info",
-            "timestamp": datetime.now().isoformat()
         },
         ticket.assigned_to
     )  

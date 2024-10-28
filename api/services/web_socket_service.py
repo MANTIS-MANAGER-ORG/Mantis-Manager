@@ -99,7 +99,18 @@ class ConnectionManager:
             logger.warning(f"Intento de autenticación fallido: Usuario {user_id} no conectado.")
 
     async def send_personal_message(self, message: str | dict, user_id: str, obligate : bool = False):
+        
+        if isinstance(message, str):
+            message = json.dumps(
+                {
+                    "message": message, 
+                    "type": "info", 
+                    "timestamp": datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+                }
+            )
+        
         if isinstance(message, dict):
+            dict.update(message, {"timestamp": datetime.now().strftime("%Y-%m-%d %H:%M:%S")})
             message = json.dumps(message)
 
         if user_id in self.active_connections:

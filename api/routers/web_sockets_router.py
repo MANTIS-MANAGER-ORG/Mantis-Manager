@@ -59,7 +59,6 @@ async def websocket_endpoint(websocket: WebSocket, user_id: str):
                                 {
                                     "message": "Autenticación exitosa.",
                                     "type":"info",
-                                    "timestamp": datetime.now().isoformat()
                                 },
                                 user_id
                             )
@@ -68,7 +67,6 @@ async def websocket_endpoint(websocket: WebSocket, user_id: str):
                                 {
                                     "message": "Error al autenticar usuario. No coincide el ID del usuario correcto.",
                                     "type":"error",
-                                    "timestamp": datetime.now().isoformat()
                                 },
                                 user_id,
                                 True
@@ -79,7 +77,6 @@ async def websocket_endpoint(websocket: WebSocket, user_id: str):
                             {
                                 "message": "Error al autenticar usuario.",
                                 "type":"error",
-                                "timestamp": datetime.now().isoformat()
                             },
                             user_id,
                             True
