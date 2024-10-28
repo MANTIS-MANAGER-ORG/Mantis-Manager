@@ -11,12 +11,15 @@ const Header = ({ onTabChange }) => {
   const { userRole } = useAuth(); // Obtener el rol del usuario desde el contexto
   const { darkMode, toggleDarkMode } = useTheme(); // Obtén el estado y función del contexto
 
+
   const toggleSettings = () => {
     setIsSettingsOpen(!isSettingsOpen);
+    console.log(isSettingsOpen)
   };
 
   const toggleNotifications = () => {
     setIsNotificationsOpen(!isNotificationsOpen);
+    console.log(isNotificationsOpen)
   };
 
   return (
@@ -39,10 +42,14 @@ const Header = ({ onTabChange }) => {
             </button>
           </div>
 
-          {isSettingsOpen && <Ajustes />}
+          {isSettingsOpen &&
+          <div>
+           <Ajustes />
+           </div>}
           {isNotificationsOpen && (
             <div className="absolute top-16 right-4 bg-white rounded-lg p-4 w-80">
-              <TicketNotifications />
+              <TicketNotifications isOpen={isNotificationsOpen} />
+              
             </div>
           )}
 

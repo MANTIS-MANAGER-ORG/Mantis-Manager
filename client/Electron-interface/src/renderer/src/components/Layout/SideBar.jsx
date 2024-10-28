@@ -50,7 +50,7 @@ const Sidebar = ({ activeTab, onTabChange }) => {
              style={{ backgroundImage: `url("${localStorage.getItem('foto')}")` }}>
         </div>
         <h2 className={`text-sm font-semibold text-center text-gray-100 transition-all duration-300 ${isOpen ? 'block' : 'hidden'}`}>
-          SR Andrés
+          SR{localStorage.getItem('name')}
         </h2>
         <h3 className={`text-xs font-medium text-center text-gray-400 transition-all duration-300 ${isOpen ? 'block' : 'hidden'}`}>
           Vp Admin
