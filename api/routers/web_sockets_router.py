@@ -37,6 +37,7 @@ async def process_command(command: str, user_id: str) -> str:
 
 @ws_router.websocket("/ws/{user_id}")
 async def websocket_endpoint(websocket: WebSocket, user_id: str):
+    print("Conexión WebSocket establecida para usuario", user_id)
     await manager.connect(websocket, user_id)
     logger.info(f"Connected to user {user_id}")
     try:
@@ -54,6 +55,7 @@ async def websocket_endpoint(websocket: WebSocket, user_id: str):
                     try:
                         payload = verify_access_token(response[1])
                         if payload.get("sub") == user_id:
+                            print("Enviamos comando de auth para user",user_id)
                             manager.set_auth(user_id, True)
                             await manager.send_personal_message(
                                 {
@@ -75,7 +77,7 @@ async def websocket_endpoint(websocket: WebSocket, user_id: str):
                         logger.error(f"Error al autenticar usuario {user_id}: {e}")
                         await manager.send_personal_message(
                             {
-                                "message": "Error al autenticar usuario.",
+                                "message": f"Error al autenticar usuario. {e}",
                                 "type":"error",
                             },
                             user_id,
@@ -86,6 +88,7 @@ async def websocket_endpoint(websocket: WebSocket, user_id: str):
                 await websocket.send_text(response)
                 logger.info(f"Enviado a {user_id}: {response}")
     except WebSocketDisconnect:
+        print("Websocket desconectado para",user_id)
         logger.info(f"Disconnected from user {user_id}")
         await manager.disconnect(user_id)
     except Exception as e:

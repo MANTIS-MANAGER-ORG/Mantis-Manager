@@ -69,7 +69,10 @@ class ConnectionManager:
         if user_id in self.active_connections:
             # Cerrar la conexión anterior si existe
             try:
+                print(self.active_connections[user_id][0])
                 await self.active_connections[user_id][0].close()
+                
+                print("Conexión WebSocket anterior cerrada para usuario", user_id)
                 logger.info(f"Conexión WebSocket anterior cerrada para usuario {user_id}")
             except Exception as e:
                 logger.error(f"Error al cerrar la conexión anterior para usuario {user_id}: {e}")
@@ -84,6 +87,7 @@ class ConnectionManager:
             try:
                 await self.active_connections[user_id][0].close()
                 self.active_connections[user_id][1] = False
+                print("Conexión WebSocket desconectada para usuario", user_id)
                 logger.info(f"Conexión WebSocket desconectada para usuario {user_id}")
             except Exception as e:
                 logger.error(f"Error al cerrar la conexión WebSocket para usuario {user_id}: {e}")
@@ -91,6 +95,7 @@ class ConnectionManager:
 
     # Método para establecer la autenticación
     def set_auth(self, user_id: str, is_authenticated: bool):
+        print("Autenticación establecida para usuario", user_id, ":", is_authenticated)
         if user_id in self.active_connections:
             websocket, _ = self.active_connections[user_id]
             self.active_connections[user_id] = (websocket, is_authenticated)
