@@ -8,7 +8,7 @@ from fastapi.security import HTTPBearer
 from sqlalchemy import func
 from sqlalchemy.orm import Session
 
-from services.web_socket_service import manager
+from services.web_socket_service2 import manager
 from config.db import get_db
 from models.historial_model import Registro
 from models.machine_model import Machine
@@ -208,7 +208,7 @@ async def create_ticket(
     db.add(new_registro)
     db.commit()
     
-    await manager.send_personal_message(
+    await manager.send_general_message(
         {
             "message": f"Has creado un nuevo ticket con ID {new_ticket.id} para la máquina {machine.id}.",
             "type":"info",
@@ -377,7 +377,7 @@ async def assign_ticket(
             }
             related_open_requests.append(solicitud_data)
             
-    await manager.send_personal_message(
+    await manager.send_general_message(
         {
             "message": f"Se ha asignado tu ticket con id {ticket.id} para la maquina {ticket.machine_id} a {user.first_name} {user.last_name}. (id: {user.id})",
             "type":"info",
@@ -385,7 +385,7 @@ async def assign_ticket(
         ticket.created_by
     )
     
-    await manager.send_personal_message(
+    await manager.send_general_message(
         {
             "message": f"Se te ha asignado el ticket con id {ticket.id} para la maquina {ticket.machine_id}",
             "type":"info",
@@ -480,7 +480,7 @@ async def change_ticket_state(
             }
             related_open_requests.append(solicitud_data)
             
-    await manager.send_personal_message(
+    await manager.send_general_message(
         {
             "message": f"Se ha cambiado el estado de tu ticket con id {ticket.id} para la maquina {ticket.machine_id} a {ticket_state}.",
             "type":"info",
@@ -488,7 +488,7 @@ async def change_ticket_state(
         ticket.created_by
     )
     
-    await manager.send_personal_message(
+    await manager.send_general_message(
         {
             "message": f"Se ha cambiado el estado del ticket con id {ticket.id} para la maquina {ticket.machine_id} del que eres encargado a {ticket_state}.",
             "type":"info",
@@ -590,7 +590,7 @@ async def request_ticket_closure(
     db.add(new_registro)
     db.commit()  
     
-    await manager.send_personal_message(
+    await manager.send_general_message(
         {
             "message": f"Se ha solicitado el cierre de tu ticket con id {ticket.id} para la maquina {ticket.machine_id}",
             "type":"info",
@@ -598,7 +598,7 @@ async def request_ticket_closure(
         ticket.created_by
     )
     
-    await manager.send_personal_message(
+    await manager.send_general_message(
         {
             "message": f"Se ha solicitado el cierre del ticket con id {ticket.id} para la maquina {ticket.machine_id} del que eres encargado a.",
             "type":"info",

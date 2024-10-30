@@ -3,7 +3,7 @@
 from datetime import datetime
 
 from fastapi import WebSocket, WebSocketDisconnect, APIRouter 
-from services.web_socket_service import manager
+from services.web_socket_service2 import manager
 from services.jwt_services import verify_access_token
 import logging
 
@@ -56,7 +56,7 @@ async def websocket_endpoint(websocket: WebSocket, user_id: str):
                         payload = verify_access_token(response[1])
                         if payload.get("sub") == user_id:
                             print("Enviamos comando de auth para user",user_id)
-                            manager.set_auth(user_id, True)
+                            manager.set_auth(user_id,websocket, True)
                             await manager.send_personal_message(
                                 {
                                     "message": "Autenticación exitosa.",
@@ -71,6 +71,7 @@ async def websocket_endpoint(websocket: WebSocket, user_id: str):
                                     "type":"error",
                                 },
                                 user_id,
+                                websocket,
                                 True
                             )
                     except Exception as e:
@@ -81,6 +82,7 @@ async def websocket_endpoint(websocket: WebSocket, user_id: str):
                                 "type":"error",
                             },
                             user_id,
+                            websocket,
                             True
                         )
             else:
@@ -90,8 +92,8 @@ async def websocket_endpoint(websocket: WebSocket, user_id: str):
     except WebSocketDisconnect:
         print("Websocket desconectado para",user_id)
         logger.info(f"Disconnected from user {user_id}")
-        await manager.disconnect(user_id)
+        await manager.disconnect(websocket,user_id)
     except Exception as e:
         logger.error(f"Error occurred: {e}")
-        await manager.disconnect(user_id)
+        await manager.disconnect(websocket,user_id)
         await websocket.close()
