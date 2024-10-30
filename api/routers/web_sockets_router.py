@@ -62,6 +62,7 @@ async def websocket_endpoint(websocket: WebSocket, user_id: str):
                                     "message": "Autenticación exitosa.",
                                     "type":"info",
                                 },
+                                websocket,
                                 user_id
                             )
                         else:
