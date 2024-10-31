@@ -12,6 +12,26 @@ export const AuthProvider = ({ children }) => {
     const [websocket, setWebSocket] = useState(null);
     const [isConnected, setIsConnected] = useState(false);
 
+
+
+    const register = async  ( datos ) => {
+
+        try{
+
+            const data = await fetchApi('https://mantis-manager-production-ce86.up.railway.app/jefe_desarrollo/register', 'Post', datos);
+            console.log(data);
+
+        }catch(e){
+            console.log(e);
+
+
+
+
+
+
+
+    }};
+
     const login = async (id, password) => {
         try {
             const data = await fetchApi('https://mantis-manager-production-ce86.up.railway.app/login', 'POST', {
@@ -123,7 +143,8 @@ export const AuthProvider = ({ children }) => {
             error,
             websocket,
             isConnected, 
-            setIsConnected
+            setIsConnected,
+            register
         }}>
             {children}
         </AuthContext.Provider>

@@ -164,13 +164,14 @@ const UserManagement = () => {
       try {
         // Si no es edición, agregar un nuevo usuario
         const newUser = await register(
-          formData.id,
-          formData.firstName,
-          formData.lastName,
-          formData.email,
-          formData.phone,
-          formData.password,
-          parseInt(formData.role, 10)
+          {
+          id: formData.id,
+          first_name: formData.firstName,
+          last_name: formData.lastName,
+          email: formData.email,
+          phone: formData.phone,
+          password: formData.password,
+          role: parseInt(formData.role, 10)}
         )
 
         console.log('Nuevo usuario registrado:', newUser)
