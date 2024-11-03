@@ -3,8 +3,11 @@ from typing import Dict, List, Tuple
 from config.db import get_db
 from models.notification_model import Notification
 from datetime import datetime
+import pytz
 from middlewares.logger_middleware import logger
 import json
+
+bogota_tz = pytz.timezone("America/Bogota")
 
 class NotificationManager:
     @staticmethod
@@ -108,6 +111,9 @@ class ConnectionManager:
         websocket: WebSocket ,
         force: bool = False
     ):
+        
+        timestamp = datetime.now(bogota_tz).strftime("%Y-%m-%d %H:%M:%S")
+        
         if isinstance(message, str):
             try:
                 data = json.loads(message)
@@ -116,12 +122,12 @@ class ConnectionManager:
                     {
                         "message": message,
                         "type": "info",
-                        "timestamp": datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+                        "timestamp": timestamp
                     }
                 )
         
         if isinstance(message, dict):
-            dict.update(message, {"timestamp": datetime.now().strftime("%Y-%m-%d %H:%M:%S")})
+            dict.update(message, {"timestamp": timestamp})
             message = json.dumps(message)
         
         if user_id in self.active_connections:
