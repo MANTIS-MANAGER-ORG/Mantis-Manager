@@ -1,7 +1,5 @@
 # routers/user_auth_router.py
 
-from datetime import datetime
-
 from fastapi import WebSocket, WebSocketDisconnect, APIRouter 
 from services.web_socket_service2 import manager
 from services.jwt_services import verify_access_token
@@ -55,15 +53,14 @@ async def websocket_endpoint(websocket: WebSocket, user_id: str):
                     try:
                         payload = verify_access_token(response[1])
                         if payload.get("sub") == user_id:
-                            print("Enviamos comando de auth para user",user_id)
                             manager.set_auth(user_id,websocket, True)
                             await manager.send_personal_message(
                                 {
                                     "message": "Autenticación exitosa.",
                                     "type":"info",
                                 },
-                                websocket,
-                                user_id
+                                user_id,
+                                websocket
                             )
                         else:
                             await manager.send_personal_message(
@@ -91,7 +88,6 @@ async def websocket_endpoint(websocket: WebSocket, user_id: str):
                 await websocket.send_text(response)
                 logger.info(f"Enviado a {user_id}: {response}")
     except WebSocketDisconnect:
-        print("Websocket desconectado para",user_id)
         logger.info(f"Disconnected from user {user_id}")
         await manager.disconnect(websocket,user_id)
     except Exception as e:

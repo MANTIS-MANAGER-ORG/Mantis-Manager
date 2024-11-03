@@ -72,13 +72,13 @@ class ConnectionManager:
         except Exception as e:
             logger.error(f"Error al conectar: {e}") 
             
-    def disconnect(self, websocket: WebSocket, user_id: str):
+    async def disconnect(self, websocket: WebSocket, user_id: str):
         if user_id in self.active_connections:
             try:
                 self.active_connections[user_id] = [
                     (ws, auth) 
                     for ws, auth in self.active_connections[user_id] 
-                    if ws != websocket
+                    if ws.client != websocket.client
                 ]
                 
                 if self.active_connections[user_id] == []:
@@ -86,13 +86,14 @@ class ConnectionManager:
             except Exception as e:
                 logger.error(f"Error al desconectar: {e}")
     
-    def set_auth(self, user_id: str, websocket:WebSocket, auth: bool):
+    def set_auth(self, user_id: str, websocket: WebSocket, auth: bool):
         if user_id in self.active_connections:
             for i, (ws, _) in enumerate(self.active_connections[user_id]):
-                if ws == websocket:
+                if ws.client == websocket.client:
                     self.active_connections[user_id][i] = (ws, auth)
-                    break
-          
+        else:
+            self.active_connections[user_id] = [(websocket, auth)]
+
     async def send_personal_message(
         self, 
         message:str | dict, 
@@ -101,21 +102,24 @@ class ConnectionManager:
         force: bool = False
     ):
         if isinstance(message, str):
-            message = json.dumps(
-                {
-                    "message": message, 
-                    "type": "info", 
-                    "timestamp": datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-                }
-            )
+            try:
+                data = json.loads(message)
+            except json.JSONDecodeError:
+                message = json.dumps(
+                    {
+                        "message": message,
+                        "type": "info",
+                        "timestamp": datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+                    }
+                )
         
         if isinstance(message, dict):
             dict.update(message, {"timestamp": datetime.now().strftime("%Y-%m-%d %H:%M:%S")})
             message = json.dumps(message)
-            
+        
         if user_id in self.active_connections:
             for ws, auth in self.active_connections[user_id]:
-                if ws == websocket and (force or auth):
+                if ws.client == websocket.client and (force or auth):
                     try:
                         await ws.send_text(message)
                         logger.info(f"Mensaje enviado a usuario {user_id}: {message}")
@@ -129,24 +133,11 @@ class ConnectionManager:
                 logger.info(f"Mensaje almacenado para usuario {user_id}: {message}")
         
     async def send_general_message(self, message: str | dict, user_id: str):    
-        if isinstance(message, str):
-            message = json.dumps(
-                {
-                    "message": message, 
-                    "type": "info", 
-                    "timestamp": datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-                }
-            )
-        
-        if isinstance(message, dict):
-            dict.update(message, {"timestamp": datetime.now().strftime("%Y-%m-%d %H:%M:%S")})
-            message = json.dumps(message)
-            
         if user_id in self.active_connections:
             for ws, auth in self.active_connections[user_id]:
                 if auth:
                     try:
-                        await ws.send_text(message)
+                        await self.send_personal_message(message,user_id,ws)
                         logger.info(f"Mensaje enviado a usuario {user_id}: {message}")
                     except Exception as e:
                         logger.error(f"Error al enviar mensaje a usuario {user_id}: {e}")
@@ -161,7 +152,7 @@ class ConnectionManager:
             notifications = await NotificationManager.get_pending_messages(user_id)
             for message in notifications:
                 try:
-                    await self.send_general_message(message)
+                    await self.send_general_message(message,user_id)
                     logger.info(f"Mensaje pendiente enviado a usuario {user_id}: {message}")
                 except Exception as e:
                     logger.error(f"Error al enviar mensaje pendiente a usuario {user_id}: {e}")
