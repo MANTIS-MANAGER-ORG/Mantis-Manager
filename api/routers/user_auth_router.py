@@ -62,11 +62,10 @@ async def login(
         "role_id": user.role_id
     }
     
-    await manager.send_personal_message(
+    await manager.send_general_message(
         {
             "message": f"Se ha iniciado sesion en el sistema, bienvenido {user.first_name}.",
             "type": "info",
-            "timestamp": datetime.now().isoformat()
         },
         user.id
     )

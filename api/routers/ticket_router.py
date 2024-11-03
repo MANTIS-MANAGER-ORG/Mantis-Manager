@@ -8,7 +8,7 @@ from fastapi.security import HTTPBearer
 from sqlalchemy import func
 from sqlalchemy.orm import Session
 
-from services.web_socket_service2 import manager
+from services.web_socket_service import manager
 from config.db import get_db
 from models.historial_model import Registro
 from models.machine_model import Machine

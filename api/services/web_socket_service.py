@@ -1,5 +1,5 @@
 from fastapi import WebSocket
-from typing import Dict
+from typing import Dict, List, Tuple
 from config.db import get_db
 from models.notification_model import Notification
 from datetime import datetime
@@ -59,119 +59,130 @@ class NotificationManager:
             logger.error(f"Error al agregar notificación: {e}")
         finally:
             session.close()
-
+            
 class ConnectionManager:
     def __init__(self):
-        # Ahora active_connections guarda una tupla con (WebSocket, autenticado)
-        self.active_connections: Dict[str, (WebSocket, bool)] = {}
-
+        self.active_connections: Dict[str, List[Tuple[WebSocket, bool]]] = {}
+        
     async def connect(self, websocket: WebSocket, user_id: str):
+        try:
+            await websocket.accept()
+            self.active_connections[user_id] = self.active_connections.get(user_id, [])
+            self.active_connections[user_id].append((websocket, False))
+        except Exception as e:
+            logger.error(f"Error al conectar: {e}") 
+            
+    async def disconnect(self, websocket: WebSocket, user_id: str):
         if user_id in self.active_connections:
-            # Cerrar la conexión anterior si existe
             try:
-                print(self.active_connections[user_id][0])
-                await self.active_connections[user_id][0].close()
+                self.active_connections[user_id] = [
+                    (ws, auth) 
+                    for ws, auth in self.active_connections[user_id] 
+                    if ws.client != websocket.client
+                ]
                 
-                print("Conexión WebSocket anterior cerrada para usuario", user_id)
-                logger.info(f"Conexión WebSocket anterior cerrada para usuario {user_id}")
+                if self.active_connections[user_id] == []:
+                    del self.active_connections[user_id]    
             except Exception as e:
-                logger.error(f"Error al cerrar la conexión anterior para usuario {user_id}: {e}")
-        
-        # Aceptar la nueva conexión y agregarla al diccionario con estado de autenticación False por defecto
-        await websocket.accept()
-        self.active_connections[user_id] = (websocket, False)
-        logger.info(f"Conexión WebSocket establecida para usuario {user_id}")
-
-    async def disconnect(self, user_id: str):
+                logger.error(f"Error al desconectar: {e}")
+    
+    def set_auth(self, user_id: str, websocket: WebSocket, auth: bool):
         if user_id in self.active_connections:
-            try:
-                await self.active_connections[user_id][0].close()
-                self.active_connections[user_id][1] = False
-                print("Conexión WebSocket desconectada para usuario", user_id)
-                logger.info(f"Conexión WebSocket desconectada para usuario {user_id}")
-            except Exception as e:
-                logger.error(f"Error al cerrar la conexión WebSocket para usuario {user_id}: {e}")
-            del self.active_connections[user_id]
-
-    # Método para establecer la autenticación
-    def set_auth(self, user_id: str, is_authenticated: bool):
-        print("Autenticación establecida para usuario", user_id, ":", is_authenticated)
-        if user_id in self.active_connections:
-            websocket, _ = self.active_connections[user_id]
-            self.active_connections[user_id] = (websocket, is_authenticated)
-            logger.info(f"Autenticación establecida para usuario {user_id}: {is_authenticated}")
+            for i, (ws, _) in enumerate(self.active_connections[user_id]):
+                if ws.client == websocket.client:
+                    self.active_connections[user_id][i] = (ws, auth)
         else:
-            logger.warning(f"Intento de autenticación fallido: Usuario {user_id} no conectado.")
-
-    async def send_personal_message(self, message: str | dict, user_id: str, obligate : bool = False):
-        
+            self.active_connections[user_id] = [(websocket, auth)]
+            
+    def is_authenticated(self, user_id: str, websocket: WebSocket):
+        if user_id in self.active_connections:
+            for ws, auth in self.active_connections[user_id]:
+                if ws.client == websocket.client:
+                    return auth
+        return False
+    
+    async def send_personal_message(
+        self, 
+        message:str | dict, 
+        user_id: str, 
+        websocket: WebSocket ,
+        force: bool = False
+    ):
         if isinstance(message, str):
-            message = json.dumps(
-                {
-                    "message": message, 
-                    "type": "info", 
-                    "timestamp": datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-                }
-            )
+            try:
+                data = json.loads(message)
+            except json.JSONDecodeError:
+                message = json.dumps(
+                    {
+                        "message": message,
+                        "type": "info",
+                        "timestamp": datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+                    }
+                )
         
         if isinstance(message, dict):
             dict.update(message, {"timestamp": datetime.now().strftime("%Y-%m-%d %H:%M:%S")})
             message = json.dumps(message)
-
+        
         if user_id in self.active_connections:
-            websocket, is_authenticated = self.active_connections[user_id]
-
-            # Verificar si el usuario está autenticado antes de enviar mensajes
-            if not is_authenticated and not obligate:
-                logger.warning(f"Usuario {user_id} no está autenticado. No se puede enviar el mensaje.")
-                NotificationManager.add_notification(user_id, message)
-                return
-
-            try:
-                await websocket.send_text(message)
-                logger.info(f"Mensaje enviado a usuario {user_id}: {message}")
-            except Exception as e:
-                logger.error(f"Error al enviar mensaje a usuario {user_id}: {e}")
-                NotificationManager.add_notification(user_id, message)
-                logger.info(f"Mensaje almacenado para usuario {user_id} debido a error al enviar.")
+            for ws, auth in self.active_connections[user_id]:
+                if ws.client == websocket.client and (force or auth):
+                    try:
+                        await ws.send_text(message)
+                        logger.info(f"Mensaje enviado a usuario {user_id}: {message}")
+                    except Exception as e:
+                        logger.error(f"Error al enviar mensaje a usuario {user_id}: {e}")
+                        NotificationManager.add_notification(user_id, message)
+                        logger.info(f"Mensaje almacenado para usuario {user_id} debido a error al enviar.")
         else:
-            if not obligate:
+            if not force:
                 NotificationManager.add_notification(user_id, message)
                 logger.info(f"Mensaje almacenado para usuario {user_id}: {message}")
-
-    async def send_pending_messages(self, user_id: str):
         
+    async def send_general_message(self, message: str | dict, user_id: str):    
+        if user_id in self.active_connections:
+            for i, (ws, auth) in enumerate(self.active_connections[user_id]):
+                if auth:
+                    try:
+                        await self.send_personal_message(message,user_id,ws)
+                        logger.info(f"Mensaje enviado a usuario {user_id}: {message}")
+                        print("Mensaje enviado a usuario",user_id,"por su socket numero",i)
+                    except Exception as e:
+                        logger.error(f"Error al enviar mensaje a usuario {user_id}: {e}")
+                        NotificationManager.add_notification(user_id, message)
+                        logger.info(f"Mensaje almacenado para usuario {user_id} debido a error al enviar.")
+        else:
+            NotificationManager.add_notification(user_id, message)
+            logger.info(f"Mensaje almacenado para usuario {user_id}: {message}")
+            
+    async def send_pending_messages(self, user_id: str):
         if user_id in self.active_connections and await NotificationManager.exist_notifications(user_id):
-            websocket, is_authenticated = self.active_connections[user_id]
-
-            if not is_authenticated:
-                logger.warning(f"Usuario {user_id} no está autenticado. No se pueden enviar mensajes pendientes.")
-                await websocket.send_text("Aún no ha sido autenticado. No se pueden enviar mensajes pendientes.")
-                return            
             notifications = await NotificationManager.get_pending_messages(user_id)
             for message in notifications:
                 try:
-                    await websocket.send_text(message)
+                    await self.send_general_message(message,user_id)
                     logger.info(f"Mensaje pendiente enviado a usuario {user_id}: {message}")
                 except Exception as e:
                     logger.error(f"Error al enviar mensaje pendiente a usuario {user_id}: {e}")
                     NotificationManager.add_notification(user_id, message)
         else:
             try:
-                await self.active_connections[user_id][0].send_text("No hay mensajes pendientes.")
+                await self.active_connections[user_id][0][0].send_text("No hay mensajes pendientes.")
             except Exception as e:
                 logger.error(f"Error al enviar mensaje de no hay mensajes pendientes a usuario {user_id}: {e}")
-
+                
     async def broadcast(self, message: str):
         for user_id, (websocket, is_authenticated) in self.active_connections.items():
-            if not is_authenticated:
-                logger.warning(f"Usuario {user_id} no está autenticado. No se le enviará el broadcast.")
-                continue
-            try:
-                await websocket.send_text(message)
-                logger.info(f"Mensaje broadcast enviado a usuario {user_id}: {message}")
-            except Exception as e:
-                logger.error(f"Error al enviar broadcast a usuario {user_id}: {e}")
-
-# Instanciar el ConnectionManager
+            if is_authenticated:
+                try:
+                    await websocket.send_text(message)
+                    logger.info(f"Mensaje enviado a usuario {user_id}: {message}")
+                except Exception as e:
+                    logger.error(f"Error al enviar mensaje a usuario {user_id}: {e}")
+                    NotificationManager.add_notification(user_id, message)
+                    logger.info(f"Mensaje almacenado para usuario {user_id} debido a error al enviar.")
+            else:
+                NotificationManager.add_notification(user_id, message)
+                logger.info(f"Mensaje almacenado para usuario {user_id}: {message}")
+                
 manager = ConnectionManager()

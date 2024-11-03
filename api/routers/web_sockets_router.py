@@ -1,7 +1,7 @@
 # routers/user_auth_router.py
 
 from fastapi import WebSocket, WebSocketDisconnect, APIRouter 
-from services.web_socket_service2 import manager
+from services.web_socket_service import manager
 from services.jwt_services import verify_access_token
 import logging
 
@@ -44,11 +44,7 @@ async def websocket_endpoint(websocket: WebSocket, user_id: str):
 
             response = await process_command(data, user_id)
             
-            if response == "GET_PENDING_MESSAGES":
-                # Enviar mensajes pendientes
-                logger.info("Enviando mensajes pendientes...")
-                await manager.send_pending_messages(user_id)
-            elif len(response) == 2:
+            if len(response) == 2:
                 if response[0] == "Authorization":
                     try:
                         payload = verify_access_token(response[1])
@@ -74,9 +70,15 @@ async def websocket_endpoint(websocket: WebSocket, user_id: str):
                             )
                     except Exception as e:
                         logger.error(f"Error al autenticar usuario {user_id}: {e}")
+                        
+                        if e.status_code == 401:
+                            msg = "Error al autenticar el usuario. Token expirado"
+                        else:
+                            msg = f"Error al autenticar usuario. {e}"
+                        
                         await manager.send_personal_message(
                             {
-                                "message": f"Error al autenticar usuario. {e}",
+                                "message": msg,
                                 "type":"error",
                             },
                             user_id,
@@ -84,9 +86,25 @@ async def websocket_endpoint(websocket: WebSocket, user_id: str):
                             True
                         )
             else:
-                # Enviar la respuesta normalmente
-                await websocket.send_text(response)
-                logger.info(f"Enviado a {user_id}: {response}")
+                if manager.is_authenticated(user_id, websocket):
+                    if response == "GET_PENDING_MESSAGES":
+                        # Enviar mensajes pendientes
+                        logger.info("Enviando mensajes pendientes...")
+                        await manager.send_pending_messages(user_id)
+                    else:
+                        # Enviar la respuesta normalmente
+                        await websocket.send_text(response)
+                        logger.info(f"Enviado a {user_id}: {response}")
+                else:
+                    await manager.send_personal_message(
+                        {
+                            "message": f"Operación no permitida. Usuario no autenticado.",
+                            "type":"error",
+                        },
+                        user_id,
+                        websocket,  
+                        True
+                    ) 
     except WebSocketDisconnect:
         logger.info(f"Disconnected from user {user_id}")
         await manager.disconnect(websocket,user_id)
