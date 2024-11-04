@@ -27,7 +27,7 @@ const SignUp = () => {
     };
 
     return (
-        <div className="flex flex-col items-center justify-center h-screen bg-white p-4">
+        <div className="flex flex-col items-center justify-center h-screen bg-red-500 p-4">
             <Header />
             <div className="mt-5 w-full max-w-md">
                 <SignUpForm onSubmit={handleSignUp} onGoBack={handleGoBack} />

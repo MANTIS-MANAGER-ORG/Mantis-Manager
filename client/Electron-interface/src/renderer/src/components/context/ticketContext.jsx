@@ -104,11 +104,14 @@ export const TicketProvider = ({ children }) => {
       console.error("Estado no válido:", newState);
       return;
     }
+    const encodedState = encodeURIComponent(newState);
 
-    const url = `https://mantis-manager-production-ce86.up.railway.app/tickets/ticket/${ticketId}/${newState}`;
+    const url = `https://mantis-manager-production-ce86.up.railway.app/tickets/ticket/${ticketId}/${encodedState}`;
 
     try {
+      console.log(url);
       const updatedTicket = await fetchApi(url, "PATCH");
+      console.log("Ticket actualizado:", updatedTicket);
 
       setTicketsData((prevData) => {
         const updatedTickets = { ...prevData };
@@ -120,38 +123,40 @@ export const TicketProvider = ({ children }) => {
 
         // Añade el ticket al nuevo estado
         if (newState === "pendiente") {
+          console.log('hola');
           updatedTickets["En cola"].push(updatedTicket);
         } else if (newState === "en proceso") {
+          console.log('hola2');
           updatedTickets["En proceso"].push(updatedTicket);
         } else if (newState === "asignado") {
           updatedTickets["Asignado"].push(updatedTicket);
+          console.log('hola3');
         }
+        console.log(updatedTickets);
+        
 
         return updatedTickets;
       });
+      console.log('Ticket cambiado a', ticketsData);
     } catch (error) {
       console.error("Error al cambiar el estado del ticket:", error);
     }
   };
 
-  // Función para asignar un ticket
   const AsignedTicket = async (id, assigned) => {
     const url = `https://mantis-manager-production-ce86.up.railway.app/tickets/ticket/assing/${id}?user_id=${assigned}`;
-
+  
     try {
       const updatedTicket = await fetchApi(url, "PATCH");
-
-      setTicketsData((prevData) => ({
-        ...prevData,
-        "En cola": prevData["En cola"].filter((ticket) => ticket.id !== id),
-        "En proceso": [...prevData["En proceso"], updatedTicket],
-      }));
-
-      console.log('Ticket asignado y movido a "En proceso"');
+  
+      
+  
+      console.log('Ticket asignado y movido a "En proceso":', updatedTicket);
     } catch (error) {
       console.error("Error al asignar el ticket:", error);
     }
   };
+  
 
   // Función para crear una solicitud de cierre o reapertura
   const createRequest = async (ticketId, description, type) => {
@@ -214,16 +219,33 @@ export const TicketProvider = ({ children }) => {
     if (!hasMoreTickets) return;
     const nextPage = page + 1;
     setCurrentPage(nextPage);
+    
     fetchTickets(nextPage);
+    
   };
+
 
   const handlePageL = () => {
     if (page > 1) {
       const nextPage = page - 1;
       setCurrentPage(nextPage);
+      
+    
       fetchTickets(nextPage);
+      
     }
   };
+  const samePage=()=>{
+    setCurrentPage(page);
+    console.log('misma página');
+    fetchTickets(page);
+
+  };
+
+
+  useEffect (()=>{
+    console.log(page)
+  },[page]);
 
   return (
     <TicketContext.Provider
@@ -247,7 +269,8 @@ export const TicketProvider = ({ children }) => {
         getRequest,
         respondeRequest,
         activeSession, 
-        setActiveSection
+        setActiveSection,
+        samePage
       }}
     >
       {children}

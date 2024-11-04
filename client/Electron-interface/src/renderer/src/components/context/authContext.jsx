@@ -56,10 +56,7 @@ export const AuthProvider = ({ children }) => {
                 setIsConnected(true);
             };
 
-            newWebSocket.onmessage = (event) => {
-                // Manejar mensajes recibidos del WebSocket
-                console.log("Mensaje recibido:", event.data);
-            };
+          
 
             newWebSocket.onclose = () => {
                 console.log("Desconectado del WebSocket");
@@ -100,18 +97,27 @@ export const AuthProvider = ({ children }) => {
 
     const get_Image = async () => {
         const url = `https://mantis-manager-production-ce86.up.railway.app/users/image/${localStorage.getItem('user_id')}`;
+        console.log(url);
         try {
             const data = await fetchApi(url);
-            localStorage.setItem('foto', data.path);
+    
+            if (data && data.path) {
+                localStorage.setItem('foto', data.path);
+            } else {
+                localStorage.removeItem('foto'); // Elimina 'foto' si no hay data.path
+            }
+    
             return data;
         } catch (error) {
             console.error('Error:', error);
+            localStorage.removeItem('foto'); // Elimina 'foto' si hay un error en la solicitud
             throw error;
         }
     };
+    
 
     const uploadImage = async (profileImage) => {
-        const url = 'https://mantis-manager-production-ce86.up.railway.app/users/upload/admin';
+        const url = `https://mantis-manager-production-ce86.up.railway.app/users/upload/${localStorage.getItem('user_id')}`;
         const formData = new FormData();
         formData.append('file', profileImage);
 

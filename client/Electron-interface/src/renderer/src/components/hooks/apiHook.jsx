@@ -20,7 +20,7 @@ export const useApi = () => {
           ...(isFormData ? {} : { 'Content-Type': 'application/json' }),
           'Authorization': `Bearer ${localStorage.getItem('access_token') || ''}`, // Agregar token si existe
         },
-        body: isFormData ? body : body ? JSON.stringify(body) : null,
+        body: isFormData ? body : body ? JSON.stringify(body) : null,// se vuelve el objeto js un json 
       };
 
       console.log(body);
