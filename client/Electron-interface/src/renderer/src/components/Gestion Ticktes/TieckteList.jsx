@@ -1,32 +1,49 @@
-import React, { useState } from 'react';
-import { HiOutlineEye } from 'react-icons/hi';
-import { useTicketContext } from '../context/ticketContext'; // Importamos el contexto
-import TicketDetails from './TicketsDetails'; 
+import React, { useState, useEffect } from 'react';
+import { HiOutlineEye, HiArrowLeft, HiArrowRight } from 'react-icons/hi';
+import { useTicketContext } from '../context/ticketContext';
+import TicketDetails from './TicketsDetails';
 
 const TicketList = () => {
-  const { ticketsData, loading } = useTicketContext(); // Usamos el contexto
+  const {
+    ticketsData,
+    loading,
+    handlePageR,
+    handlePageL,
+    page,
+    hasMoreTickets,
+  } = useTicketContext();
+
   const [selectedTicket, setSelectedTicket] = useState(null);
   const [openModal, setOpenModal] = useState(false);
-  const [currentTab, setCurrentTab] = useState('En cola');
+  const [showSpinner, setShowSpinner] = useState(true);
 
-  // Asegúrate de que `ticketsData[currentTab]` existe y es un array
-  if (!ticketsData[currentTab]) {
-    return <div>No hay datos disponibles para la pestaña actual.</div>;
-  }
+  const allTickets = Object.values(ticketsData).flat();
 
-  // Maneja la selección del ticket
   const handleSelectTicket = (ticket) => {
     setSelectedTicket(ticket);
     setOpenModal(true);
   };
 
+  const handleAssignTo = (newAssignedId) => {
+    if (selectedTicket) {
+      selectedTicket.assigned_to = { id: newAssignedId };
+    }
+  };
+
+  useEffect(() => {
+    setShowSpinner(true); // Activar el spinner cada vez que `ticketsData` cambia
+    const timer = setTimeout(() => {
+      setShowSpinner(false); // Desactivar el spinner después de un retraso
+    }, 1000); // Ajusta el tiempo aquí (1000 ms = 1 segundo)
+
+    return () => clearTimeout(timer); // Limpiar el temporizador en caso de que el componente se desmonte
+  }, [ticketsData]);
+
   const handleCloseModal = () => {
-    console.log('cerrando modal')
     setOpenModal(false);
   };
 
-  // Muestra un loader si está cargando
-  if (loading) {
+  if (loading || showSpinner) {
     return (
       <div className="flex justify-center items-center min-h-[200px]">
         <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-blue-500"></div>
@@ -35,25 +52,13 @@ const TicketList = () => {
   }
 
   return (
-    <div className="flex flex-col items-center min-h-screen ">
+    <div className="flex flex-col items-center min-h-screen">
       <div className="bg-white p-8 rounded-lg w-full">
         <h1 className="text-3xl font-bold text-center mb-8">Lista de Tickets</h1>
-        {/* Pestañas para los estados de los tickets */}
-        <div className="flex justify-around mb-4">
-          {Object.keys(ticketsData).map((tab) => (
-            <button
-              key={tab}
-              className={`px-4 py-2 ${currentTab === tab ? 'bg-blue-500 text-white' : 'text-blue-500'}`}
-              onClick={() => setCurrentTab(tab)}
-            >
-              {tab}
-            </button>
-          ))}
-        </div>
         <div className="overflow-x-auto">
           <table className="min-w-full border-collapse">
-            <thead >
-              <tr className="bg-slate-50 border-slate-200 ">
+            <thead>
+              <tr className="bg-slate-50 border-slate-200">
                 <th className="py-4 px-6 text-left font-sans text-sm font-normal leading-none text-slate-500">ID</th>
                 <th className="py-4 px-6 text-left font-sans text-sm font-normal leading-none text-slate-500">Descripción</th>
                 <th className="py-4 px-6 text-left font-sans text-sm font-normal leading-none text-slate-500">Estado</th>
@@ -62,13 +67,16 @@ const TicketList = () => {
               </tr>
             </thead>
             <tbody>
-              {ticketsData[currentTab].map((ticket) => (
+              {allTickets.map((ticket) => (
                 <tr key={ticket.id} className="hover:bg-gray-50">
-                  <td className="py-4 px-6 text-left border-b boder-slate-200 text-sm font-semibold text-slate-700">{ticket.id}</td>
-                  <td className="py-4 px-6 text-left border-b boder-slate-200 text-sm font-semibold text-slate-700">{ticket.description}</td>
-                  <td className='border-b'>
-                    <span  className={`py-1 px-1 text-left h-10 w-10 rounded-md font-sans text-xs font-medium uppercase text-slate-900 ${ticket.state === 'pendiente' ? 'text-red-500 bg-red-200' : 'text-green-800 bg-green-200'}`}>
-                    {ticket.state}
+                  <td className="py-4 px-6 text-left border-b border-slate-200 text-sm font-semibold text-slate-700">{ticket.id}</td>
+                  <td className="py-4 px-6 text-left border-b border-slate-200 text-sm font-semibold text-slate-700">{ticket.description}</td>
+                  <td className="border-b">
+                    <span className={`py-1 px-2 rounded-md font-sans text-xs font-medium uppercase text-slate-900
+                      ${ticket.state === 'pendiente' ? 'text-red-500 bg-red-200' : 
+                      ticket.state === 'asignado' ? 'text-yellow-900 bg-yellow-200' : 
+                      ticket.state === 'en proceso' ? 'text-green-800 bg-green-200' : ''}`}>
+                      {ticket.state}
                     </span>
                   </td>
                   <td className="py-4 px-10 text-left border-b">
@@ -78,16 +86,21 @@ const TicketList = () => {
                     >
                       <HiOutlineEye size={24} />
                     </button>
-                  </td >
-                  <td className='"py-4 px-6 text-left border-b boder-slate-200 text-sm font-semibold text-slate-700"'>{ticket?.assigned_to?.id || 'No asignado'}</td>
+                  </td>
+                  <td className="py-4 px-6 text-left border-b border-slate-200 text-sm font-semibold text-slate-700">
+                    {ticket?.assigned_to?.id || 'No asignado'}
+                  </td>
                 </tr>
               ))}
             </tbody>
           </table>
         </div>
+        <div className="flex p-4">
+          <HiArrowLeft onClick={handlePageL} className={`cursor-pointer ${page === 1 ? 'opacity-50 cursor-not-allowed' : ''}`} />
+          <HiArrowRight onClick={handlePageR} className={`ml-2 cursor-pointer ${!hasMoreTickets ? 'opacity-50 cursor-not-allowed' : ''}`} />
+        </div>
       </div>
 
-      {/* Modal */}
       {openModal && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center">
           <div className="bg-white p-6 rounded-lg shadow-lg relative max-w-md w-full">
@@ -97,7 +110,13 @@ const TicketList = () => {
             >
               &times;
             </button>
-            {selectedTicket && <TicketDetails ticket={selectedTicket} handleClose={handleCloseModal} />} {/* Componente TicketDetails */}
+            {selectedTicket && (
+              <TicketDetails 
+                ticket={selectedTicket} 
+                handleClose={handleCloseModal} 
+                handleAssignTo={handleAssignTo} 
+              />
+            )}
           </div>
         </div>
       )}
@@ -106,6 +125,7 @@ const TicketList = () => {
 };
 
 export default TicketList;
+
 
 
 

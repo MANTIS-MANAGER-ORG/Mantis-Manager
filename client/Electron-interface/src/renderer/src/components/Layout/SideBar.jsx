@@ -53,7 +53,7 @@ const Sidebar = ({ activeTab, onTabChange }) => {
           SR{localStorage.getItem('name')}
         </h2>
         <h3 className={`text-xs font-medium text-center text-gray-400 transition-all duration-300 ${isOpen ? 'block' : 'hidden'}`}>
-          Vp Admin
+          Vp {localStorage.getItem('name')}
         </h3>
       </div>
 

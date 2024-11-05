@@ -20,6 +20,7 @@ const NotificationComponent = ({ isOpen }) => {
             };
 
             websocket.onmessage = (event) => {
+                console.log('hola')
                 const message = event.data;
                 console.log(message);
                 try {
@@ -51,7 +52,7 @@ const NotificationComponent = ({ isOpen }) => {
             return () => {
                 // Cleanup on component unmount
                 websocket.onopen = null;
-                websocket.onmessage = null;
+               
                 websocket.onclose = null;
                 websocket.onerror = null;
                 console.log("Manejadores de WebSocket eliminados.");
@@ -59,15 +60,17 @@ const NotificationComponent = ({ isOpen }) => {
         } else {
             console.error("WebSocket no está disponible.");
         }
-    }, [websocket]); // Depend on websocket to set up listeners when it changes
+    }, [websocket, showOldNotifications]); // Depend on websocket to set up listeners when it changes
 
     const addMessage = (message) => {
         setNotifications((prev) => [...prev, message]);
     };
 
     const getPendingMessages = () => {
+        console.log('hola')
         if (!websocket || websocket.readyState !== WebSocket.OPEN) {
             alert("WebSocket no está conectado.");
+
             return;
         }
         websocket.send("get_nosend_messages");
@@ -75,6 +78,7 @@ const NotificationComponent = ({ isOpen }) => {
     };
 
     const handleShowOldNotifications = () => {
+        console.log('hola')
         setShowOldNotifications(true);
         getPendingMessages(); // Llamar al WebSocket para obtener mensajes pendientes
     };

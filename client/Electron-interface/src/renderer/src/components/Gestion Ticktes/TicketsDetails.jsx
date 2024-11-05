@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useTicketContext } from '../context/ticketContext'; // Importa el contexto
 
 const TicketDetails = ({ ticket, handleClose }) => {
-  const { AsignedTicket, changeTicketState, createRequest } = useTicketContext(); // Usa createRequest
+  const { AsignedTicket, changeTicketState, createRequest,samePage } = useTicketContext(); // Usa createRequest
   const [assignedTo, setAssignedTo] = useState(''); // Estado para almacenar el ID del usuario asignado
   const [newStatus, setNewStatus] = useState(ticket.state); // Estado para cambiar el estado del ticket
   const [isEditingStatus, setIsEditingStatus] = useState(false); // Estado para controlar la edición del estado
@@ -12,7 +12,7 @@ const TicketDetails = ({ ticket, handleClose }) => {
   // Sincroniza el estado local cuando se recibe un nuevo ticket
   useEffect(() => {
     setTicketDetails(ticket);
-    setNewStatus(ticket.state); // Actualiza el nuevo estado también
+    setNewStatus(ticket.state);
   }, [ticket]);
 
   // Maneja la asignación del ticket
@@ -21,7 +21,7 @@ const TicketDetails = ({ ticket, handleClose }) => {
       try {
         await AsignedTicket(String(ticket.id), assignedTo); // Usa la función del contexto
         setMessage(`Ticket asignado al usuario con ID: ${assignedTo}`);
-        setTicketDetails((prevDetails) => ({ ...prevDetails, assigned_to: assignedTo })); // Actualiza el estado local
+        samePage(); 
         handleClose(); // Cierra el modal después de la asignación
       } catch (error) {
         setMessage('Error al asignar el ticket');
@@ -184,6 +184,7 @@ const TicketDetails = ({ ticket, handleClose }) => {
 };
 
 export default TicketDetails;
+
 
 
 
